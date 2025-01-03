@@ -1,21 +1,11 @@
-import Image from "next/image";
+// import Image from "next/image";
 
-interface AdminItemProps {
-  id: string;
-  studentname: string;
-  studentimage: string;
-  studentclass: string;
-  term: string;
-  payment: string;
-  balances: string;
-  count: number;
-  totalItems?: number;
-  selected?: boolean;
-}
+import { AdminItemProps } from "@/types";
+
 
 const AdminItem: React.FC<AdminItemProps> = ({
   id,
-  studentimage,
+  // studentimage,
   studentname,
   studentclass,
   term,
@@ -23,7 +13,7 @@ const AdminItem: React.FC<AdminItemProps> = ({
   balances,
   count,
   totalItems,
-  selected,
+  // selected,
 }) => {
   return (
     <div
@@ -31,12 +21,12 @@ const AdminItem: React.FC<AdminItemProps> = ({
         count == totalItems && "mb-10"
       } text-xs flex flex-col items-center w-full`}
     >
-      <div className="w-full text-black flex items-center">
+      <div className="w-full text-neutral-700 flex items-center">
         <div className="flex w-full grow items-center py-2">
           <div className="w-1/5 pl-5 truncate">{id}</div>
           <div className="flex w-full flex-row items-center gap-2 font-[600]">
-            <div className="border bg-white rounded-full p-1 pr-3 flex items-center gap-2">
-              <div className="rounded-full overflow-hidden">
+            <div className=" p-2 pr-3 flex items-center gap-2">
+              {/* <div className="rounded-full overflow-hidden">
                 <Image
                   src={studentimage}
                   alt="Student Image"
@@ -44,7 +34,7 @@ const AdminItem: React.FC<AdminItemProps> = ({
                   height={50}
                   style={{ objectFit: "cover" }}
                 />
-              </div>
+              </div> */}
               <div>{studentname}</div>
             </div>
           </div>

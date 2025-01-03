@@ -1,11 +1,6 @@
 import Image from "next/image";
 import AdminItem from "./adminitem";
-
-interface AdminTableProps {
-  data: any[];
-  maxCount?: number;
-  maxPage?: number;
-}
+import { AdminTableProps } from "@/types";
 
 const AdminTable: React.FC<AdminTableProps> = ({
   data,
@@ -108,9 +103,9 @@ const AdminTable: React.FC<AdminTableProps> = ({
   const dataToUse = data.length > 0 ? data : sampleData;
 
   return (
-    <div className="min-w-96 mx-5  mt-5 md:mt-10 rounded-xl overflow-y-hidden overflow-x-scroll shadow-sm border scrollbar-hidden md:block">
+    <div className="min-w-96 mx-5  mt-5  rounded-xl overflow-y-hidden overflow-x-scroll shadow-sm border scrollbar-hidden md:block">
       <div className="w-full relative">
-        <div className="w-full absolute bg-[#F4F7FCBF] text-white  z-10 backdrop-blur-sm top-0">
+        <div className="w-full absolute bg-slate-200 text-white  z-10 backdrop-blur-sm top-0">
           <div className="flex flex-col ">
             <div className="flex flex-row justify-between mx-4 mb-6 mt-4">
               <div className="flex flex-row justify-between items-center gap-3">
@@ -130,7 +125,7 @@ const AdminTable: React.FC<AdminTableProps> = ({
               </div>
             </div>
 
-            <div className="flex w-full text-xs pb-3 font-[700]  text-black">
+            <div className="flex w-full text-xs pb-3 font-bold text-neutral-800">
               <div className="flex w-full grow items-start">
                 <div className="w-1/5 pl-5 truncate ">ID</div>
                 <div className="w-full truncate">STUDENT</div>
