@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+'use client'
+
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import DashboardWrapper from "./dashboardWrapper";
+import './globals.css';
+import StoreProvider from "./redux";
+import AuthProvider from "./authProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,24 +15,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "School Management Sytem",
-  description: "Paying fees has never been this easy",
-};
+
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <DashboardWrapper>
+        <StoreProvider>
+          <AuthProvider>
         {children}
-        </DashboardWrapper>
+        </AuthProvider>
+        </StoreProvider>
       </body>
     </html>
   );

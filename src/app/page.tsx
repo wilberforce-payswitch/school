@@ -1,9 +1,10 @@
-import AdminTable from "../components/admintable";
+import LoginPage from "./login/page";
 
-export default function Home() {
+export default function Login() {
+    
   return (
     <div>
-      <AdminTable data={[]} />
+      <LoginPage />
     </div>
   );
 }

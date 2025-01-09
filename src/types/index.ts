@@ -22,6 +22,18 @@ export interface AdminTableProps {
     selected?: boolean;
   }
 
+
+  export interface ClassItemProps {
+    id: string,
+    studentClass: string,
+    numberOfStudents: number,
+    numberofCompletedFees: number,
+    numberStillOwing: number,
+    count: number,
+    totalItems?: number;
+  }
+
+
   export interface SidebarLinkProps {
     href: string;
     icon: LucideIcon;
@@ -35,3 +47,12 @@ export interface AdminTableProps {
     caption: string;
     count: string;
   }
+
+export interface AuthResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    role_id: number;
+  }
+}

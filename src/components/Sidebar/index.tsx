@@ -3,8 +3,8 @@
 import {
   Home,
   LockIcon,
-  Search,
-  Settings,
+  UserPlus,
+  // Settings,
   Users,
   X,
 } from "lucide-react";
@@ -24,14 +24,13 @@ const Sidebar = () => {
   const isSideBarCollapsed = useAppSelector(
     (state) => state.global.isSideBarCollapsed,
   );
-
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl transition-all duration-300 h-full z-40 overflow-y-auto bg-gradient-to-b from-primary to-secondary ${isSideBarCollapsed ? "w-0 hidden" : "w-64 "}`;
 
   return (
     <div className={sidebarClassNames}>
       <div className="flex h-[100%] w-full flex-col justify-start">
         <div className="z-50 flex min-h-[56px] w-64 items-center justify-between px-6 pt-3">
-        <Image src="/payswitch.png" alt="logo" width={150} height={60} />
+        <Image src="/logo3.svg" alt="logo" width={120} height={60} />
          
           {isSideBarCollapsed ? null : (
             <button
@@ -56,10 +55,10 @@ const Sidebar = () => {
           </div>
         </div>
         <nav className="z-10 w-full">
-          <SidebarLink icon={Home} label="Home" href="/" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
-          <SidebarLink icon={Settings} label="Settings" href="/settings" />
-          <SidebarLink icon={Users} label="Team" href="/teams" />
+          <SidebarLink icon={Home} label="Home" href="/home" />
+          <SidebarLink icon={Users} label="Classes" href="/classes" />
+          {/* <SidebarLink icon={Search} label="Classes" href="/classes" /> */}
+          <SidebarLink icon={UserPlus} label="Register" href="/register" />
         </nav>
 
         {/* <button
@@ -127,7 +126,7 @@ const Sidebar = () => {
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
   const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
+    pathname === href || (pathname === "/" && href === "/home");
 
   return (
     <Link href={href} className="w-full">
