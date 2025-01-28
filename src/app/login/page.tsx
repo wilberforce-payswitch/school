@@ -10,7 +10,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 
 const passwordValidation = new RegExp(
   //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-  /^(?=.*\d).{7,}$/
+  /^.{5,}$/
 );
 
 const loginSchema = z.object({
@@ -42,13 +42,12 @@ export default function LoginPage() {
           const userData = {
             id: response.data.user.id,
             name: response.data?.user.name,
-            role_id: response.data?.user.role_id,
+            roleId: response.data?.user.roleId,
           };
           // console.log("Before route oo")
           dispatch(setAuth({ token: response.data?.token, user: userData }));
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("user", JSON.stringify(userData));
-          // console.log("You for route oo")
           router.push("/home");
         } else {
           console.log("Error", response.error);
@@ -68,7 +67,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       <div className="relative z-10 w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
         <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          Welcome Back
+          Welcome
         </h2>
         <form onSubmit={formik.handleSubmit}>
           <div className="mb-4">

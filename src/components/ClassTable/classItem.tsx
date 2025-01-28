@@ -5,8 +5,7 @@ const ClassItem: React.FC<ClassItemProps> = ({
   id,
   studentClass,
   numberOfStudents,
-  numberofCompletedFees,
-  numberStillOwing,
+  fees,
   count,
   totalItems
 }) => {
@@ -17,12 +16,11 @@ const ClassItem: React.FC<ClassItemProps> = ({
       } text-xs flex flex-col items-center w-full`}
     >
       <div className="w-full text-neutral-800 flex items-center">
-        <div className="flex w-full grow items-center py-2">
-          <div className="w-1/5 pl-5 truncate">{id}</div>
-          <div className="w-full truncate">{studentClass}</div>
+        <div className="flex w-full grow gap-10 items-center py-2">
+          <div className="w-full pl-5">{id}</div>
+          <div className="w-full pl-5 truncate">{studentClass}</div>
           <div className="w-full truncate">{numberOfStudents}</div>
-          <div className="w-full truncate">{numberofCompletedFees}</div>
-          <div className="w-full truncate">{numberStillOwing}</div>
+          <div className="w-full pr-10 truncate">GH₵ {fees}</div>
         </div>
       </div>
     </div>

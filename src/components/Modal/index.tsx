@@ -1,31 +1,26 @@
-import { X } from "lucide-react";
+import { Users, X } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import ReactDOM from "react-dom";
 
 type Props = {
   title: string;
   isOpen: boolean;
   onClose: () => void;
-  onAction: () => void;
-  children: React.ReactNode;
-  actionLabel?: string;
+  className: string;
+  setClassName: (value: string) => void;
+  createClass:(e: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  creatingClass: boolean
 };
 
-const Modal = ({
-  title,
-  isOpen,
-  onClose,
-  onAction,
-  children,
-  actionLabel = "Register",
-}: Props) => {
-  if (!isOpen) return null;
+const Modal = ({ title, isOpen, onClose, className, setClassName, createClass, creatingClass }: Props) => {
+ 
 
-  return ReactDOM.createPortal(
+  if (!isOpen) return
+
+  return (
     <div className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50 p-4">
       <div className="relative w-full max-w-md rounded-xl bg-white shadow-lg min-h-[420px] flex flex-col">
-        <div className="relative h-20 bg-gray-200 rounded-t-xl">
+        <div className="relative h-20 bg-gray-200 rounded-t-x</div>l">
           <div className="flex py-2 items-center justify-between px-4">
             <h2 className="text-lg font-semibold">{title}</h2>
             <button
@@ -44,21 +39,29 @@ const Modal = ({
               className="rounded-full border-4 border-white"
             />
           </div>
-        </div>
 
-        <div className="p-4 mt-5">{children}</div>
-
-        <div className="flex justify-center p-10">
-          <button
-            className="w-1/2 justify-center items-center py-3 bg-blue-800 text-white font-medium rounded-xl hover:bg-blue-900"
-            onClick={onAction}
-          >
-            {actionLabel}
-          </button>
+          <div className="p-4 mt-20 w-full">
+            <form className="flex flex-col justify-center items-center mt-4 space-y-10" onSubmit={createClass}>
+              <div className="flex w-full rounded border-gray-400 p-2 shadow-sm focus-within:outline-none focus-within:ring-2  focus-within:ring-blue-600 focus:border-transparent">
+                <Users />
+                <input
+                value={className}
+                onChange={(e)=> setClassName(e.target.value)}
+                  placeholder="Enter class name"
+                  className="w-full focus:outline-none text-black placeholder:text-neutral-800 pl-2"
+                />
+              </div>
+              <button
+              type="submit"
+              className="w-1/2 justify-center bg-blue-800 text-white py-2 rounded-md hover:bg-blue-900"
+            >
+            {creatingClass ? "Creating Class..." : "Create Class"}
+            </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 

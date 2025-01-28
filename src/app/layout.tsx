@@ -1,39 +1,25 @@
-'use client'
+import type { Metadata } from "next";
 
-import { Geist, Geist_Mono } from "next/font/google";
-import './globals.css';
-import StoreProvider from "./redux";
-import AuthProvider from "./authProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import "./globals.css";
+import DashboardWrapper from "./dashboardWrapper";
 
 
+
+export const metadata: Metadata = {
+  title: "School Management System",
+  description: "Paying fees has never been this easy",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>
-          <AuthProvider>
-        {children}
-        </AuthProvider>
-        </StoreProvider>
+        <DashboardWrapper>{children}</DashboardWrapper>
       </body>
     </html>
   );

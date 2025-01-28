@@ -1,3 +1,4 @@
+'use client'
 import AdminTable from '@/components/admintable'
 import React from 'react'
 

@@ -75,11 +75,11 @@ const ClassTable: React.FC<AdminTableProps> = ({
           <div className="flex flex-col ">
             <div className="flex w-full text-xs  py-3 font-bold text-neutral-800">
               <div className="flex w-full grow items-start">
-                <div className="w-1/5 pl-5 truncate ">ID</div>
-                <div className="w-full truncate">CLASS</div>
+                <div className="w-full pl-5 ">ID</div>
+                <div className="w-full pl-8 truncate">CLASS</div>
                 <div className="w-full truncate">STUDENT POPULATION</div>
-                <div className=" w-full truncate">COMPLETED PAYMENT</div>
-                <div className=" w-full truncate">INCOMPLETE PAYMENT</div>
+                <div className=" w-full truncate">FEES</div>
+             
               </div>
             </div>
           </div>
@@ -131,10 +131,9 @@ const ClassTable: React.FC<AdminTableProps> = ({
                         count={index + 1}
                         totalItems={dataToUse.length}
                         id={item.id}
-                        studentClass={item.class}
-                        numberOfStudents={item.numberOfStudents}
-                        numberofCompletedFees={item.numberofCompletedFees}
-                        numberStillOwing={item.numberStillOwing}
+                        studentClass={item.name}
+                        numberOfStudents={item.studentsCount}
+                        fees={item.totalFees}
                       />
                     </td>
                   </tr>
