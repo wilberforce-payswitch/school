@@ -27,8 +27,6 @@ const Register = () => {
   const [parentId, setParentId] = useState("");
   const [selectedClassId, setSelectedClassId] = useState<string>("");
   const [className, setClassName] = useState("");
-
-  console.log(parentId);
   const [step, setStep] = useState(1);
 
   const { data: classes } = useGetSchoolClassesQuery();

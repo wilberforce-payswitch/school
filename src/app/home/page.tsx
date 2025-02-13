@@ -5,13 +5,16 @@ import ClassTable from "@/components/ClassTable";
 import FeeTable from "@/components/FeeTable";
 import PaymentCard from "@/components/PaymentCard";
 import LoadingSpinner from "@/components/Spinner";
+import SuperAdminHome from "@/components/SuperAdminHome";
 import { setStudentsId } from "@/state";
 import {
   useGetSchoolClassesQuery,
   useGetStudentBalanceQuery,
   useGetStudentsWithParentQuery,
+  useGetTotalPaymentStatusStatisticsQuery,
 } from "@/state/api";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { skip } from "node:test";
 import React, { useEffect, useState } from "react";
 
 const HomePage = () => {
@@ -21,11 +24,18 @@ const HomePage = () => {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null
   );
-  const { data: classNamees, error, isLoading } = useGetSchoolClassesQuery();
+  const {
+    data: classNamees,
+    error,
+    isLoading,
+  } = useGetSchoolClassesQuery(undefined, { skip: user?.roleId !== 2 });
   // console.log(user?.id);
-  const { data: students } = useGetStudentsWithParentQuery({
-    parentId: user?.id || "",
-  });
+  const { data: students } = useGetStudentsWithParentQuery(
+    user?.id ? { parentId: user.id } : skipToken,
+    { skip: user?.roleId !== 4 }
+  );
+
+  const {data: transactions} = useGetTotalPaymentStatusStatisticsQuery( user?.roleId === 1 ? undefined : skipToken)
 
   useEffect(() => {
     if (students) {
@@ -61,18 +71,20 @@ const HomePage = () => {
 
   return (
     <>
-      {user?.roleId === 1 ? (
+      {user?.roleId === 1 && <SuperAdminHome transactions={transactions} />}
+      {user?.roleId === 2 && (
         <div>
           <ClassTable data={classNamees || []} />
         </div>
-      ) : (
+      )}
+      {user?.roleId === 4 && (
         <>
           <div className="flex items-center justify-center">
             <PaymentCard
               balances={balance || []}
               students={students || []}
               onStudentSelect={handleStudentSelection}
-              selectedStudentId={selectedStudentId}
+              // selectedStudentId={selectedStudentId}
             />
           </div>
           <FeeTable payments={balance || []} loading={balanceLoading} />

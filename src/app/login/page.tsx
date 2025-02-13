@@ -43,6 +43,7 @@ export default function LoginPage() {
             id: response.data.user.id,
             name: response.data?.user.name,
             roleId: response.data?.user.roleId,
+            school: response.data?.user.school,
           };
           // console.log("Before route oo")
           dispatch(setAuth({ token: response.data?.token, user: userData }));
@@ -81,7 +82,7 @@ export default function LoginPage() {
               type="email"
               value={formik.values.email}
               id="email"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
+              className="w-full px-4 py-2 border text-neutral-800 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
               placeholder="Enter your email"
               onChange={formik.handleChange}
             />

@@ -4,7 +4,20 @@ import {
   getStudentByParentUrl,
   loginUrl,
 } from "@/services/enpoints";
-import { AdminResponse, AuthResponse, CreateClassResponse, ParentResponse, PayFeesProps, Payment, RegisterProps, SchoolClass, StudentProps, Students } from "@/types";
+import {
+  AdminResponse,
+  AuthResponse,
+  CreateClassResponse,
+  ParentResponse,
+  PayFeesProps,
+  Payment,
+  paymentStatusStatistics,
+  RegisterProps,
+  SchoolClass,
+  StatisticsProps,
+  StudentProps,
+  Students,
+} from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const api = createApi({
@@ -45,59 +58,67 @@ export const api = createApi({
     }),
     getStudentPaymentHistory: build.query<Payment[], { studentId: string[] }>({
       query: ({ studentId }) => {
-        const studentIdsParam = studentId.join(',');
-        return  `${getAllStudentsUrl}/${studentIdsParam}/payments`},
+        const studentIdsParam = studentId.join(",");
+        return `${getAllStudentsUrl}/${studentIdsParam}/payments`;
+      },
     }),
     getStudentBalance: build.query<Payment[], { studentId: string[] }>({
       query: ({ studentId }) => {
-        const studentIdsParam = studentId.join(',');
-      return  `${getAllStudentsUrl}/${studentIdsParam}/balances`},
+        const studentIdsParam = studentId.join(",");
+        return `${getAllStudentsUrl}/${studentIdsParam}/balances`;
+      },
     }),
     getAllStudentsBalance: build.query<any[], void>({
-      query: () => 'balances',
-      providesTags: ['StudentBalances']
+      query: () => "balances",
+      providesTags: ["StudentBalances"],
     }),
     makePayment: build.mutation<any[], PayFeesProps>({
-      query: (payment) =>({
-        url: 'payments',
+      query: (payment) => ({
+        url: "payments",
         method: "POST",
-        body: payment
-      })
+        body: payment,
+      }),
     }),
     registerParent: build.mutation<ParentResponse, RegisterProps>({
       query: (credentials) => ({
         url: "auth/register-parent",
         method: "POST",
-        body: credentials
+        body: credentials,
       }),
     }),
     registerAdmin: build.mutation<AdminResponse, RegisterProps>({
       query: (credentials) => ({
         url: "auth/register-admin",
         method: "POST",
-        body: credentials
+        body: credentials,
       }),
     }),
     createStudent: build.mutation<any[], StudentProps>({
       query: (payload) => ({
         url: "students",
         method: "POST",
-        body: payload
+        body: payload,
       }),
     }),
-    getStudentsInAClass: build.query<any[], {classId: string}>({
-      query: ({classId}) => `students/class/${classId}`,
+    getStudentsInAClass: build.query<any[], { classId: string }>({
+      query: ({ classId }) => `students/class/${classId}`,
     }),
-    createClass: build.mutation<CreateClassResponse, {name: string}>({
+    createClass: build.mutation<CreateClassResponse, { name: string }>({
       query: (name) => ({
-        url: 'classes',
+        url: "classes",
         method: "POST",
-        body: name
+        body: name,
       }),
-      invalidatesTags: ['SchoolClass']
+      invalidatesTags: ["SchoolClass"],
     }),
-    getTermsforAClass: build.query<any[], {class_uuid: string}>({
-      query: ({class_uuid}) => `classes/${class_uuid}/terms`
+    getTermsforAClass: build.query<any[], { class_uuid: string }>({
+      query: ({ class_uuid }) => `classes/${class_uuid}/terms`,
+    }),
+    getSchoolStatistics: build.query<StatisticsProps, {school_id: string | undefined}>({
+      query: ({school_id}) => `schools/${school_id}`,
+    }),
+    getTotalPaymentStatusStatistics: build.query<paymentStatusStatistics, void>({
+      query: () => `payments/summary`
     })
   }),
 });
@@ -116,5 +137,7 @@ export const {
   useRegisterAdminMutation,
   useCreateStudentMutation,
   useCreateClassMutation,
-  useGetTermsforAClassQuery
+  useGetTermsforAClassQuery,
+  useGetSchoolStatisticsQuery,
+  useGetTotalPaymentStatusStatisticsQuery
 } = api;

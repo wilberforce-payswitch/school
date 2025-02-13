@@ -8,7 +8,6 @@ const AdminItem: React.FC<AdminItemProps> = ({
   count,
   totalItems,
 }) => {
-  console.log("name",studentname)
   return (
     <div
       className={`${count === 1 && "mt-24"}  ${

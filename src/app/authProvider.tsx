@@ -16,7 +16,7 @@ const AuthProvider = ({ children }: any) => {
     const user = localStorage.getItem("user");
     if (token && user) {
       const userData = JSON.parse(user);
-      console.log("Found token and user:", token, userData);
+      // console.log("Found token and user:", token, userData);
       dispatch(setAuth({ token, user: userData }));
       
     } else {

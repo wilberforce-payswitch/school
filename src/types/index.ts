@@ -51,6 +51,10 @@ export interface AuthResponse {
     id: string;
     name: string;
     roleId: number;
+    school: {
+      id: string;
+      name: string
+    }
   };
 }
 
@@ -90,8 +94,10 @@ export interface StudentItemProps {
 export interface Fee {
   termName: string;
   termId: string;
-  termFees: string;
-  totalPaid: string;
+  termFees: number;
+  additionalFees: number;
+  discounts: number;
+  totalPaid: number;
   balanceDue: number;
 }
 
@@ -163,3 +169,16 @@ export interface CreateClassResponse  {
   message: string;
   class: Class;
 };
+
+export interface StatisticsProps {
+  totalStudents: number;
+  studentsOwing: number;
+  studentsPaid: number;
+}
+
+export interface paymentStatusStatistics {
+  successful: number;
+  failed: number;
+  pending: number;
+  totalAmount: number;
+}

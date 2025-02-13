@@ -65,7 +65,6 @@ const ClassTable: React.FC<AdminTableProps> = ({
       numberStillOwing: 15,
     },
   ];
-
   const dataToUse = data.length > 0 ? data : sampleData;
 
   return (

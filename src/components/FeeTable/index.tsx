@@ -15,8 +15,8 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
   const [totalPaid, setTotalPaid] = useState<number | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [termId, setTermId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading
-  const router = useRouter(); // Initialize the router
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const [makePayment] = useMakePaymentMutation();
 
@@ -81,9 +81,6 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
       <table className="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 truncate w-2">
-              Student ID
-            </th>
             <th scope="col" className="px-6 py-3">
               Student Name
             </th>
@@ -92,6 +89,12 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
             </th>
             <th scope="col" className="px-6 py-3">
               Term Fees
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Additional Fees
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Discounts
             </th>
             <th scope="col" className="px-6 py-3">
               Total Paid
@@ -109,14 +112,16 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
             <>
               {payment.balances.map((balance: Fee) => (
                 <tr key={`${payment.studentId}-${balance.termName}`} className="bg-white border-b">
-                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  {/* <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {payment.studentId}
-                  </th>
+                  </th> */}
                   <td className="px-6 py-4">{payment.studentName}</td>
                   <td className="px-6 py-4">{balance.termName}</td>
                   <td className="px-6 py-4">GH₵ {balance.termFees}</td>
+                  <td className="px-6 py-4">GH₵ {Number(balance?.additionalFees)?.toFixed(2)}</td>
+                  <td className="px-6 py-4">GH₵ {Number(balance?.discounts)?.toFixed(2)}</td>
                   <td className="px-6 py-4">GH₵ {Number(balance.totalPaid)?.toFixed(2)}</td>
-                  <td className="px-6 py-4">GH₵ {Number(balance.balanceDue)?.toFixed(2)}</td>
+                  <td className="px-6 py-4">GH₵ {(Number(balance.balanceDue) - (balance?.discounts) + (balance?.additionalFees)).toFixed(2)}</td>
                   <td className="px-6 py-4">
                   {balance.balanceDue > 0 && (
                     <button

@@ -18,7 +18,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import Link from "next/link";
 import { logout, setIsSidebarCollapsed } from "@/state";
-import { getInitials } from "@/util/helper";
+import { getAcronym, getInitials } from "@/util/helper";
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +26,7 @@ const Sidebar = () => {
     (state) => state.global.isSideBarCollapsed
   );
   const user = useAppSelector((state) => state?.global.auth?.user);
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogout = () => {
     // Clear localStorage data
@@ -50,6 +50,7 @@ const Sidebar = () => {
         <div className="flex w-full flex-col justify-start">
           <div className="z-50 flex min-h-[56px] w-64 items-center justify-between px-6 pt-3">
             <Image src="/logo3.svg" alt="logo" width={120} height={60} />
+           
 
             {isSideBarCollapsed ? null : (
               <button
@@ -62,8 +63,9 @@ const Sidebar = () => {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-3 border-y-[1.5px] border-[#240fff] px-8 py-4">
-            <div className="text-base font-bold text-white">SMS</div>
+          <div className="flex flex-col items-center border-y-[1.5px] border-[#240fff] px-4 py-4">
+            
+            <div className="text-lg font-bold text-white">{user?.school?.name}</div>
             <div>
               <div className="mt-1 flex items-start gap-2">
                 <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-200" />
@@ -73,7 +75,7 @@ const Sidebar = () => {
           </div>
           <nav className="z-10 w-full">
             <SidebarLink icon={Home} label="Home" href="/home" />
-            {user?.roleId === 1 && (
+            {user?.roleId === 2 && (
               <>
                 <SidebarLink icon={Users} label="Classes" href="/classes" />{" "}
                 <SidebarLink
@@ -83,7 +85,7 @@ const Sidebar = () => {
                 />
               </>
             )}
-            {user?.roleId === 2 && (
+            {user?.roleId === 4 && (
               <>
                 <SidebarLink
                   icon={BadgeCent}
@@ -98,14 +100,16 @@ const Sidebar = () => {
           </nav>
         </div>
         <div className="flex flex-col mb-5 justify-center items-center">
-        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-900 text-white font-semibold">
-          {getInitials(user?.name)}
-        </div>
-        <button onClick={handleLogout} className="bg-red-600 flex gap-2 px-10 py-2 items-center justify-center rounded-md mt-4 text-white hover:bg-red-700">
-        <LogOut size={18} />
-          Sign Out
-        </button>
-        
+          <div className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-900 text-white font-semibold">
+            {getInitials(user?.name)}
+          </div>
+          <button
+            onClick={handleLogout}
+            className="bg-white flex gap-2 px-10 py-2 items-center justify-center rounded-md mt-4 text-blue-900 hover:bg-blue-900 hover:text-white"
+          >
+            <LogOut size={18} />
+            Sign Out
+          </button>
         </div>
       </div>
     </div>
