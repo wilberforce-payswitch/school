@@ -47,7 +47,7 @@ export interface TransactionstatuscardProps {
 
 export interface AuthResponse {
   token: string;
-  user: {
+  user?: {
     id: string;
     name: string;
     roleId: number;
@@ -118,6 +118,7 @@ export interface PayFeesProps {
 export interface RegisterProps {
   name: string;
   email: string;
+  school_id?: string;
 }
 
 export interface AdminResponse {
@@ -131,11 +132,15 @@ export interface AdminResponse {
 }
 export interface ParentResponse {
   message: string;
-  parent: {
+  user: {
     id: string;
     name: string;
     email: string;
     roleId: number;
+    school: {
+      id: string;
+      name: string
+    }
   };
 }
 
@@ -144,6 +149,8 @@ export interface StudentProps {
   name: string;
   parent_id: string;
   class_id: string;
+  school_id: string | undefined;
+  gender: string;
 }
 
 type Term = {
@@ -181,4 +188,38 @@ export interface paymentStatusStatistics {
   failed: number;
   pending: number;
   totalAmount: number;
+}
+
+
+export interface School {
+  message?: string | undefined;
+  schools:{   id: string;
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    terms_per_academic_year?: number;
+    created_at?: string;
+    updated_at?: string;
+  }
+
+}
+
+export interface PaymentData {
+  schoolName: string;
+  successfulPayments: number;
+}
+
+export interface OtpProps {
+ data: string | null;
+}
+
+export interface SchoolRequestProps {
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    terms_per_academic_year?: number;
+    created_at?: string;
+    updated_at?: string;
 }

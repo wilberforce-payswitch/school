@@ -8,9 +8,10 @@ type Props = {
   id: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
 };
 
-const Input = ({ id, placeholder, icon: Icon, type, value, onChange }: Props) => {
+const Input = ({ id, placeholder, icon: Icon, type, value, onChange, required }: Props) => {
   const inputStyles =
     "w-full focus:outline-none text-black placeholder:text-neutral-800 pl-2";
   return (
@@ -24,6 +25,7 @@ const Input = ({ id, placeholder, icon: Icon, type, value, onChange }: Props) =>
         autoComplete="off"
         value={value}
         onChange={onChange}
+        required={required}
       />
     </div>
   );

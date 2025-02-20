@@ -8,12 +8,16 @@ import {
   AdminResponse,
   AuthResponse,
   CreateClassResponse,
+  OtpProps,
   ParentResponse,
   PayFeesProps,
   Payment,
+  PaymentData,
   paymentStatusStatistics,
   RegisterProps,
+  School,
   SchoolClass,
+  SchoolRequestProps,
   StatisticsProps,
   StudentProps,
   Students,
@@ -81,14 +85,14 @@ export const api = createApi({
     }),
     registerParent: build.mutation<ParentResponse, RegisterProps>({
       query: (credentials) => ({
-        url: "auth/register-parent",
+        url: "register/parent",
         method: "POST",
         body: credentials,
       }),
     }),
     registerAdmin: build.mutation<AdminResponse, RegisterProps>({
       query: (credentials) => ({
-        url: "auth/register-admin",
+        url: "register-admin",
         method: "POST",
         body: credentials,
       }),
@@ -103,23 +107,62 @@ export const api = createApi({
     getStudentsInAClass: build.query<any[], { classId: string }>({
       query: ({ classId }) => `students/class/${classId}`,
     }),
-    createClass: build.mutation<CreateClassResponse, { name: string }>({
-      query: (name) => ({
+    createClass: build.mutation<CreateClassResponse, { name: string, school_id: string | undefined }>({
+      query: (data) => ({
         url: "classes",
         method: "POST",
-        body: name,
+        body: data,
       }),
       invalidatesTags: ["SchoolClass"],
     }),
     getTermsforAClass: build.query<any[], { class_uuid: string }>({
       query: ({ class_uuid }) => `classes/${class_uuid}/terms`,
     }),
-    getSchoolStatistics: build.query<StatisticsProps, {school_id: string | undefined}>({
-      query: ({school_id}) => `schools/${school_id}`,
+    getSchoolStatistics: build.query<
+      StatisticsProps,
+      { school_id: string | undefined }
+    >({
+      query: ({ school_id }) => `schools/${school_id}`,
     }),
-    getTotalPaymentStatusStatistics: build.query<paymentStatusStatistics, void>({
-      query: () => `payments/summary`
-    })
+    getTotalPaymentStatusStatistics: build.query<paymentStatusStatistics, void>(
+      {
+        query: () => `payments/summary`,
+      }
+    ),
+    getAllSchools: build.query<School[], void>({
+      query: () => "schools",
+    }),
+    getSchoolPaymentData: build.query<PaymentData[], void>({
+      query: () => "payments/data",
+    }),
+    verifyOtp: build.mutation<any[], OtpProps>({
+      query: (data) => ({
+        url: "/verify-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    changePassword: build.mutation<
+      any,
+      {
+        old_password: string;
+        new_password: string;
+        new_password_confirmation: string;
+      }
+    >({
+      query: (data) => ({
+        url: "/change-password",
+        method: "PUT",
+        body: data,
+      }),
+    }),
+    createSchool: build.mutation<School, SchoolRequestProps>({
+      query: (data) => ({
+        url: "schools/create-school",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -139,5 +182,10 @@ export const {
   useCreateClassMutation,
   useGetTermsforAClassQuery,
   useGetSchoolStatisticsQuery,
-  useGetTotalPaymentStatusStatisticsQuery
+  useGetTotalPaymentStatusStatisticsQuery,
+  useGetAllSchoolsQuery,
+  useGetSchoolPaymentDataQuery,
+  useVerifyOtpMutation,
+  useChangePasswordMutation,
+  useCreateSchoolMutation
 } = api;

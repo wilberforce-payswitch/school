@@ -21,7 +21,6 @@ const AuthProvider = ({ children }: any) => {
       
     } else {
        console.log("No token or user found, clearing auth state.");
-      dispatch(setAuth(null));
       router.replace('/login')
     }
     setIsLoading(false);

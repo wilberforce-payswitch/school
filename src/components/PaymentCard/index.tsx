@@ -18,8 +18,6 @@ const PaymentCard = ({ students, onStudentSelect, balances }: Props) => {
     onStudentSelect(id);
   };
 
-  console.log("BALANCES", JSON.stringify(balances, null, 3));
-
   return (
     <>
       {students?.map((student) => {

@@ -51,13 +51,13 @@ const EditModal = ({
             </button>
           </div>
           <div className="absolute -bottom-10 left-4">
-            <Image
+            {/* <Image
               src={`/oneheart.jpg`}
               width={70}
               height={70}
               alt="school-logo"
               className="rounded-full border-4 border-white"
-            />
+            /> */}
           </div>
 
           <div className="p-4 mt-20 w-full">

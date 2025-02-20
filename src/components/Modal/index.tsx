@@ -53,7 +53,8 @@ const Modal = ({ title, isOpen, onClose, className, setClassName, createClass, c
               </div>
               <button
               type="submit"
-              className="w-1/2 justify-center bg-blue-800 text-white py-2 rounded-md hover:bg-blue-900"
+              className={`w-1/2 justify-center  text-white py-2 rounded-md  ${className ?  "bg-blue-800 hover:bg-blue-900" : "bg-blue-800 text-white bg-opacity-50 cursor-not-allowed"} `}
+              disabled={creatingClass || !className}
             >
             {creatingClass ? "Creating Class..." : "Create Class"}
             </button>

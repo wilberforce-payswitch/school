@@ -95,6 +95,11 @@ const Sidebar = () => {
                 <SidebarLink icon={Settings} label="Settings" href="settings" />
               </>
             )}
+            {user?.roleId === 1 && (<SidebarLink
+                  icon={UserPlus}
+                  label="Register"
+                  href="/register"
+                />)}
 
             {/* <SidebarLink icon={Search} label="Classes" href="/classes" /> */}
           </nav>
