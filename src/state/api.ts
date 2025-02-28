@@ -7,6 +7,7 @@ import {
 import {
   AdminResponse,
   AuthResponse,
+  ClassFeeProp,
   CreateClassResponse,
   OtpProps,
   ParentResponse,
@@ -23,17 +24,12 @@ import {
   Students,
 } from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { number, string } from "zod";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://127.0.0.1:8000/api/",
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
+    credentials: "include", 
   }),
   reducerPath: "api",
   tagTypes: ["SchoolClass", "Students", "StudentBalances"],
@@ -46,11 +42,12 @@ export const api = createApi({
         url: loginUrl,
         method: "POST",
         body: credentials,
+        credentials: "include",
       }),
     }),
 
-    getSchoolClasses: build.query<SchoolClass[], void>({
-      query: () => "classes",
+    getSchoolClasses: build.query<SchoolClass[], {school_id: string}>({
+      query: ({school_id}) => `classes/${school_id}`,
       providesTags: ["SchoolClass"],
     }),
     getAllStudents: build.query<Students[], void>({
@@ -60,10 +57,14 @@ export const api = createApi({
     getStudentsWithParent: build.query<Students[], { parentId: string }>({
       query: ({ parentId }) => `${getStudentByParentUrl}${parentId}`,
     }),
-    getStudentPaymentHistory: build.query<Payment[], { studentId: string[] }>({
-      query: ({ studentId }) => {
+    getStudentPaymentHistory: build.query<PaymentResponse, { studentId: string[], search:string, page: number  }>({
+      query: ({ studentId, search, page }) => {
+        let queryParams = `page=${page}`;
+        if (search && search.trim() !== ''){
+          queryParams += `&search=${encodeURIComponent(search)}`
+        }
         const studentIdsParam = studentId.join(",");
-        return `${getAllStudentsUrl}/${studentIdsParam}/payments`;
+        return `${getAllStudentsUrl}/${studentIdsParam}/payments?${queryParams}`;
       },
     }),
     getStudentBalance: build.query<Payment[], { studentId: string[] }>({
@@ -115,8 +116,8 @@ export const api = createApi({
       }),
       invalidatesTags: ["SchoolClass"],
     }),
-    getTermsforAClass: build.query<any[], { class_uuid: string }>({
-      query: ({ class_uuid }) => `classes/${class_uuid}/terms`,
+    getTermsforAClass: build.query<any[], { school_id: string }>({
+      query: ({ school_id }) => `classes/${school_id}/terms`,
     }),
     getSchoolStatistics: build.query<
       StatisticsProps,
@@ -163,6 +164,25 @@ export const api = createApi({
         body: data,
       }),
     }),
+    createClassFees: build.mutation<any, ClassFeeProp>({
+      query: (data) => ({
+        url: "create-fees",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    academicYear : build.query<any[], void>({
+      query: () => "academic-year",
+    }),
+    getSchoolTransactionHistory: build.query<any[], { school_id: string | undefined, search: string, page: number}>({
+      query: ({ school_id, page, search }) => {
+        let queryParams = `page=${page}`;
+        if (search && search.trim() !== '') {
+          queryParams += `&search=${encodeURIComponent(search)}`;
+        }
+        return `payments/school-payment-data/${school_id}?${queryParams}`;
+      }
+    })
   }),
 });
 
@@ -187,5 +207,8 @@ export const {
   useGetSchoolPaymentDataQuery,
   useVerifyOtpMutation,
   useChangePasswordMutation,
-  useCreateSchoolMutation
+  useCreateSchoolMutation,
+  useAcademicYearQuery,
+  useCreateClassFeesMutation,
+  useGetSchoolTransactionHistoryQuery
 } = api;

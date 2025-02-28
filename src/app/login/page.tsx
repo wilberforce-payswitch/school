@@ -66,18 +66,23 @@ export default function LoginPage() {
       password: "",
     },
     onSubmit: async (values) => {
+      
       try {
+          // // Fetch CSRF cookie first
+          //   await fetch("http://127.0.0.1:8000/sanctum/csrf-cookie", {
+          //   method: "GET",
+          //   credentials: "include", // ✅ Important to receive the cookie
+          // });
         const response = await loginUser(values);
-        if (response?.data?.token) {
+        if (response?.data?.user) {
           const userData = {
             id: response.data.user.id,
             name: response.data?.user.name,
             roleId: response.data?.user.roleId,
             school: response.data?.user.school,
           };
-          dispatch(setAuth({ token: response.data?.token, user: userData }));
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("user", JSON.stringify(userData));
+          localStorage.setItem('user', JSON.stringify(userData));
+          dispatch(setAuth({ user: userData }));
           router.push("/home");
         } else {
           console.log("Error", response.error);

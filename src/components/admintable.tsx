@@ -8,10 +8,17 @@ import {
 import { useState } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
 import LoadingSpinner from "./Spinner";
+import { useAppSelector } from "@/app/redux";
 
 const AdminTable: React.FC<AdminTableProps> = ({
 }) => {
-  const { data: classes } = useGetSchoolClassesQuery();
+  const user = useAppSelector((state) => state?.global?.auth?.user)
+  const userSchoolId = useAppSelector(
+      (state) => state?.global?.auth?.user?.school?.id
+    );
+  const { data: classes } = useGetSchoolClassesQuery(
+   userSchoolId ? {school_id: userSchoolId}: skipToken, { skip: user?.roleId !== 2 }
+    );
   const [selectedClassId, setSelectedClassId] = useState<string>("");
 
   const { data: students, isLoading } = useGetStudentsInAClassQuery(

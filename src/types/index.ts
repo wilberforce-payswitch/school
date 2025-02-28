@@ -46,7 +46,6 @@ export interface TransactionstatuscardProps {
 }
 
 export interface AuthResponse {
-  token: string;
   user?: {
     id: string;
     name: string;
@@ -70,21 +69,56 @@ export interface Students {
   parentName: string | null;
 }
 
+// export interface Payment {
+//   id: string;
+//   termName: string;
+//   amount: string;
+//   paymentDate: string;
+//   termId?: string
+// }
+
 export interface Payment {
   id: string;
   termName: string;
+  studentName: string;
+  className: string;
   amount: string;
+  status: string;
   paymentDate: string;
-  termId?: string
+  termId?: string; // Assuming termId might be added later
 }
+
+export interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaymentResponse {
+  current_page: number;
+  data: Payment[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLink[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
+
 
 export interface StudentItemProps {
   id: string;
   selected?: boolean;
-  count: number;
+  count?: number;
   totalItems?: number;
   amount: string;
-  paymentDate: string;
+  paymentDate?: string;
   studentName: string;
   termName: string;
   studentClass: string;
@@ -222,4 +256,13 @@ export interface SchoolRequestProps {
     terms_per_academic_year?: number;
     created_at?: string;
     updated_at?: string;
+}
+
+export interface ClassFeeProp {
+  name: string
+  amount: number
+  academic_year_id: string | undefined,
+  school_id: string | undefined,
+  class_id: string | undefined,
+  due_date: string
 }

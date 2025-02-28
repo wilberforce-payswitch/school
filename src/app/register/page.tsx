@@ -5,6 +5,7 @@ import Input from "@/components/Input";
 import Modal from "@/components/Modal";
 import RegistrationCard from "@/components/RegistrationCard";
 import {
+  useAcademicYearQuery,
   useCreateClassMutation,
   useCreateSchoolMutation,
   useCreateStudentMutation,
@@ -56,10 +57,10 @@ const Register = () => {
   const [step, setStep] = useState(1);
 
   const { data: classes } = useGetSchoolClassesQuery(
-    user?.roleId === 2 ? undefined : skipToken
+ userSchoolId ? {school_id: userSchoolId}: skipToken, { skip: user?.roleId !== 2 }
   );
   const { data: terms } = useGetTermsforAClassQuery(
-    selectedClassId ? { class_uuid: selectedClassId } : skipToken,
+    userSchoolId ? { school_id: userSchoolId } : skipToken,
     { skip: user?.roleId !== 2 }
   );
   const [registerAdministrator, { isLoading }] = useRegisterAdminMutation();
@@ -73,6 +74,8 @@ const Register = () => {
   const { data } = useGetAllSchoolsQuery(
     user?.roleId === 1 ? undefined : skipToken
   );
+
+  const {data: years} = useAcademicYearQuery()
 
   const schools = data?.schools || [];
 
@@ -209,6 +212,7 @@ const Register = () => {
   const handleCreateSchoolClick = () => {
     setIsCreateSchoolModalOpen(true);
   };
+
 
   return (
     <>
@@ -409,6 +413,8 @@ const Register = () => {
           setSelectedClassId={setSelectedClassId}
           onClose={() => setIsEditModalOpen(false)}
           isOpen={isEditModalOpen}
+          userSchoolId= {userSchoolId}
+          years={years || []}
         />
       )}
 

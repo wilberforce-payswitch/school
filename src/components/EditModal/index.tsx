@@ -1,6 +1,7 @@
+import { useCreateClassFeesMutation } from "@/state/api";
 import { X } from "lucide-react";
-import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 type Props = {
   isOpen: boolean;
@@ -10,36 +11,75 @@ type Props = {
   terms: any[];
   //   creatingClass: boolean
   classes: any[];
+  userSchoolId: string | undefined;
+  years: any[];
 };
 
 const EditModal = ({
   isOpen,
   onClose,
   classes,
+  selectedClassId,
   setSelectedClassId,
-  terms,
+  userSchoolId,
+  years,
 }: Props) => {
-  const [editTerm, setEditTerm] = useState(null);
-  const [updatedTerm, setUpdatedTerm] = useState({});
+  const [createFees, { isLoading: creatingFees }] =
+    useCreateClassFeesMutation();
+  const [academicYearId, setAcademicYearId] = useState<string>("");
+
+  const [formData, setFormData] = useState({
+    name: "",
+    amount: "",
+    academic_year_id: academicYearId,
+    class_id: selectedClassId,
+    due_date: "",
+  });
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, academic_year_id: academicYearId }));
+    setFormData((prev) => ({ ...prev, class_id: selectedClassId }));
+  }, [academicYearId, selectedClassId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedTerm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEditClick = (term) => {
-    setEditTerm(term.id);
-    setUpdatedTerm(term);
+  console.log(formData.class_id);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const submissionData = {
+      ...formData,
+      amount: Number(formData.amount),
+      school_id: userSchoolId,
+    };
+    try {
+    const response = await createFees(submissionData);
+    console.log(JSON.stringify(response, null, 3));
+    if (response.data){
+      toast.success(response?.data?.message);
+      setFormData({
+        name: "",
+        amount: "",
+        academic_year_id: "",
+        class_id: "",
+        due_date: "",
+      });
+    }
+    
+    } catch (err) {
+      console.log(JSON.stringify(err))
+    }
+   
   };
 
   if (!isOpen) return;
 
   return (
     <div className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50 p-4">
-      <div className="relative w-full max-w-md rounded-xl bg-white shadow-lg min-h-full flex flex-col">
+      <div className="relative w-full max-w-md rounded-xl bg-white shadow-lg h-[60%] flex flex-col">
         <div className="relative h-20 bg-gray-200 rounded-t-x</div>l">
           <div className="flex py-2 items-center justify-between px-4">
             <h2 className="text-lg font-semibold">Title</h2>
@@ -60,91 +100,63 @@ const EditModal = ({
             /> */}
           </div>
 
-          <div className="p-4 mt-20 w-full">
-            <select
-              className="ml-2 pl-3 h-10 text-sm font-[400] border border-gray-500 rounded-md text-black focus:outline-none bg-transparent w-[60%]"
-              onChange={(e) => setSelectedClassId(e.target.value)}
-            >
-              <option value="">Select Class</option>
-              {classes?.map((classItem) => (
-                <option key={classItem.id} value={classItem.id}>
-                  {classItem.name}
-                </option>
-              ))}
-            </select>
+          <div className="p-4 mt-8 w-full">
             <div className="p-4 h-[421px] overflow-y-auto">
-              <h2 className="text-xl font-bold mb-4">Terms</h2>
-              <ul className="space-y-4">
-                {terms.map((term) => (
-                  <li key={term.id} className="border p-4 rounded-lg shadow-md">
-                    {editTerm === term.id ? (
-                      <>
-                        <input
-                          type="text"
-                          name="name"
-                          value={updatedTerm.name}
-                          onChange={handleChange}
-                          className="border p-2 rounded w-full mb-2"
-                        />
-                        <input
-                          type="number"
-                          name="fee_amount"
-                          value={updatedTerm.fee_amount}
-                          onChange={handleChange}
-                          className="border p-2 rounded w-full mb-2"
-                        />
-                        <input
-                          type="date"
-                          name="start_date"
-                          value={updatedTerm.start_date}
-                          onChange={handleChange}
-                          className="border p-2 rounded w-full mb-2"
-                        />
-                        <input
-                          type="date"
-                          name="end_date"
-                          value={updatedTerm.end_date}
-                          onChange={handleChange}
-                          className="border p-2 rounded w-full mb-2"
-                        />
-                        <button
-                          className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
-                          //   onClick={handleSave}
-                        >
-                          Save
-                        </button>
-                        <button
-                          className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-                          //   onClick={() => setEditTerm(null)}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <p>
-                          <strong>Name:</strong> {term.name}
-                        </p>
-                        <p>
-                          <strong>Fee:</strong>GH₵{term.fee_amount}
-                        </p>
-                        <p>
-                          <strong>Start Date:</strong> {term.start_date}
-                        </p>
-                        <p>
-                          <strong>End Date:</strong> {term.end_date}
-                        </p>
-                        <button
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                          onClick={() => handleEditClick(term)}
-                        >
-                          Edit
-                        </button>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  placeholder="Fee Name"
+                />
+                <input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  placeholder="Amount"
+                />
+                <select
+                  className="ml-2 pl-3 h-10 text-sm font-[400] border border-gray-500 rounded-md text-black focus:outline-none bg-transparent w-[60%]"
+                  onChange={(e) => setAcademicYearId(e.target.value)}
+                >
+                  <option value="">Select Year</option>
+                  {years?.map((year) => (
+                    <option key={year?.id} value={year?.id}>
+                      {year?.year}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="ml-2 pl-3 h-10 text-sm font-[400] border border-gray-500 rounded-md text-black focus:outline-none bg-transparent w-[60%]"
+                  onChange={(e) => setSelectedClassId(e.target.value)}
+                >
+                  <option value="">Select Class</option>
+                  {classes?.map((classItem) => (
+                    <option key={classItem.id} value={classItem.id}>
+                      {classItem.name}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  type="date"
+                  name="due_date"
+                  value={formData.due_date}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                />
+                <button
+                  type="submit"
+                  className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                >
+                  Submit
+                </button>
+              </form>
             </div>
           </div>
         </div>

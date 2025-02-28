@@ -12,12 +12,12 @@ const AuthProvider = ({ children }: any) => {
  const  router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    
     const user = localStorage.getItem("user");
-    if (token && user) {
+    if (user) {
       const userData = JSON.parse(user);
-      // console.log("Found token and user:", token, userData);
-      dispatch(setAuth({ token, user: userData }));
+   
+      dispatch(setAuth({ user: userData }));
       
     } else {
        console.log("No token or user found, clearing auth state.");

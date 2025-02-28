@@ -14,12 +14,11 @@ import {
   useGetTotalPaymentStatusStatisticsQuery,
 } from "@/state/api";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { skip } from "node:test";
 import React, { useEffect, useState } from "react";
 
 const HomePage = () => {
   const user = useAppSelector((state) => state?.global.auth?.user);
-  const studentId = useAppSelector((state) => state.global.studentsIds);
+  const userSchoolId = useAppSelector((state) => state?.global?.auth?.user?.school?.id);
   const dispatch = useAppDispatch();
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null
@@ -28,10 +27,9 @@ const HomePage = () => {
     data: classNamees,
     error,
     isLoading,
-  } = useGetSchoolClassesQuery(undefined, { skip: user?.roleId !== 2 });
-  // console.log(user?.id);
+  } = useGetSchoolClassesQuery(userSchoolId ? {school_id: userSchoolId}: skipToken, { skip: user?.roleId !== 2 });
   const { data: students } = useGetStudentsWithParentQuery(
-    user?.id ? { parentId: user.id } : skipToken,
+    user?.id ? { parentId: user?.id } : skipToken,
     { skip: user?.roleId !== 4 }
   );
 
@@ -79,7 +77,7 @@ const HomePage = () => {
       )}
       {user?.roleId === 4 && (
         <>
-          <div className="flex items-center justify-center">
+          <div className="flex flex-col gap-5 md:flex-row md:gap-0 items-center justify-center">
             <PaymentCard
               balances={balance || []}
               students={students || []}

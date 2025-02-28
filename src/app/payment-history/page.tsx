@@ -1,19 +1,27 @@
-'use client'
-import { useAppSelector } from '@/app/redux';
-import PaymentHistoryTable from '@/components/StudentTable'
-import { useGetStudentPaymentHistoryQuery } from '@/state/api';
-import { skipToken } from '@reduxjs/toolkit/query';
-
+"use client";
+import { useAppSelector } from "@/app/redux";
+import AdminPaymentTable from "@/components/AdminPaymentHistoryTable";
+import PaymentHistoryTable from "@/components/StudentTable";
+import { useGetStudentPaymentHistoryQuery } from "@/state/api";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useState } from "react";
 
 const PaymentHistory = () => {
-    const studentIds = useAppSelector((state) => state.global.studentsIds);
-    const { data: history, isLoading: loadingHistory } =
-    useGetStudentPaymentHistoryQuery(studentIds ? { studentId: studentIds } : skipToken);
-// console.log("history", JSON.stringify(history,null,3))
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const studentIds = useAppSelector((state) => state.global.studentsIds);
+  const user = useAppSelector((state) => state.global.auth?.user);
+  const { data, isLoading: loadingHistory } =
+    useGetStudentPaymentHistoryQuery(
+      studentIds ? { studentId: studentIds, page, search  } : skipToken
+    );
 
   return (
-    <PaymentHistoryTable data={history || []} loading={loadingHistory} />
-  )
-}
+    <>{user?.roleId === 4 &&
+      <PaymentHistoryTable data={data || []} loading={loadingHistory} setPage={setPage} setSearch={setSearch} />}
+      {user?.roleId === 2 && (<AdminPaymentTable />)}
+      </>
+  );
+};
 
-export default PaymentHistory
+export default PaymentHistory;

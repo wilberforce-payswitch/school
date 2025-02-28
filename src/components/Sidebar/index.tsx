@@ -18,7 +18,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import Link from "next/link";
 import { logout, setIsSidebarCollapsed } from "@/state";
-import { getAcronym, getInitials } from "@/util/helper";
+import {  getInitials } from "@/util/helper";
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
@@ -30,7 +30,6 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     // Clear localStorage data
-    localStorage.removeItem("token");
     localStorage.removeItem("user");
 
     // Dispatch the logout action to clear state
@@ -85,11 +84,21 @@ const Sidebar = () => {
                 />
               </>
             )}
-            {user?.roleId === 4 && (
+            {(user?.roleId === 4) && (
               <>
                 <SidebarLink
                   icon={BadgeCent}
                   label="Payment History"
+                  href="/payment-history"
+                />
+                <SidebarLink icon={Settings} label="Settings" href="settings" />
+              </>
+            )}
+            {(user?.roleId === 2) && (
+              <>
+                <SidebarLink
+                  icon={BadgeCent}
+                  label="Transaction History"
                   href="/payment-history"
                 />
                 <SidebarLink icon={Settings} label="Settings" href="settings" />
