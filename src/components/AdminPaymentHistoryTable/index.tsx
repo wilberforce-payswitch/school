@@ -18,7 +18,6 @@ const AdminPaymentTable = () => {
   return (
     <div className="px-10 py-5">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        {/* Search Bar */}
         <div className="pb-4 bg-white dark:bg-gray-900">
           <label htmlFor="table-search" className="sr-only">Search</label>
           <div className="relative mt-1">

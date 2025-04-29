@@ -24,7 +24,6 @@ import {
   Students,
 } from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { number, string } from "zod";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -86,7 +85,7 @@ export const api = createApi({
     }),
     registerParent: build.mutation<ParentResponse, RegisterProps>({
       query: (credentials) => ({
-        url: "register/parent",
+        url: "register-parent",
         method: "POST",
         body: credentials,
       }),
