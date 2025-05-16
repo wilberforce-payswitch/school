@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AuthProvider = ({ children }: any) => {
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(true); 
   const auth = useAppSelector((state) => state.global.auth);
   const dispatch = useAppDispatch();
  const  router = useRouter()

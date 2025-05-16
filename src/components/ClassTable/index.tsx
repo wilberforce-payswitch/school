@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { AdminTableProps } from "@/types";
 import ClassItem from "./classItem";
+import { useAppSelector } from "@/app/redux";
+import { useGetSchoolStatisticsQuery } from "@/state/api";
+import { skipToken } from "@reduxjs/toolkit/query";
+import Card from "../Card";
 
 const ClassTable: React.FC<AdminTableProps> = ({
   data,
@@ -65,9 +69,45 @@ const ClassTable: React.FC<AdminTableProps> = ({
       numberStillOwing: 15,
     },
   ];
+
+  const user = useAppSelector((state) => state?.global?.auth?.user)
+  const schoolId = user?.school?.id;
+
+  const { data: schoolData } = useGetSchoolStatisticsQuery(
+    schoolId ? { school_id: schoolId } : skipToken,
+    { skip: user?.roleId !== 2 }
+  );
+  const studentCount = schoolData?.totalStudents || 0;
+
   const dataToUse = data.length > 0 ? data : sampleData;
 
   return (
+    <div>
+       <div className="flex mt-2 gap-5 px-8 pb-8">
+          {user?.roleId === 2 && (
+            <>
+              <Card
+                backgroundColor="bg-white"
+                count={studentCount}
+                caption="Total Students"
+                borderColor="border-grey-200"
+              />
+              <Card
+                backgroundColor="bg-red-100"
+                count={schoolData?.studentsOwing || 0}
+                caption="Students with Pending Payments"
+                borderColor="border-red-200"
+              />
+              <Card
+                backgroundColor="bg-green-100"
+                count={schoolData?.studentsPaid || 0}
+                caption="Students with completed Payments"
+                borderColor="border-green-200"
+              />
+            </>
+          )}
+        </div>
+    
     <div className="min-w-96 mx-5  mt-10  rounded-xl overflow-y-hidden overflow-x-scroll shadow-sm border scrollbar-hidden md:block">
       <div className="w-full relative">
         <div className="w-full absolute bg-slate-200 text-white  z-10 backdrop-blur-sm top-0">
@@ -142,6 +182,7 @@ const ClassTable: React.FC<AdminTableProps> = ({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

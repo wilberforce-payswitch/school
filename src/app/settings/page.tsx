@@ -1,204 +1,197 @@
 "use client";
-import { useChangePasswordMutation } from "@/state/api";
-import { useFormik } from "formik";
-import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { z } from "zod";
-import { toFormikValidationSchema } from "zod-formik-adapter";
-import { useAppDispatch } from "../redux";
-import { setAuth } from "@/state";
+import AcademicYearTab from "@/components/AcademicYearTab";
+import ClassTab from "@/components/ClassTab";
+import DeleteAccountTab from "@/components/DeleteAccountTab";
+import PasswordTab from "@/components/PasswordTab";
+import TabNavigation from "@/components/TabNavigation";
+import { useState } from "react";
 
-
-const passwordValidation = new RegExp(
-  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-  /^.{5,}$/
-);
-
-const passwordSchema = z
-  .object({
-    currentPassword: z
-      .string()
-      .regex(passwordValidation, { message: "incorrect Password" }),
-    newPassword: z.string().regex(passwordValidation, {
-      message:
-        "Password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters.",
-    }),
-    confirmPassword: z.string().regex(passwordValidation, {
-      message:
-        "Password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters.",
-    }),
-  })
-  .refine(
-    (values) => {
-      return values.newPassword === values.confirmPassword;
-    },
-    {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    }
-  );
+type TabType = 'password' | 'class' | 'academic' | 'delete';
 
 const Settings = () => {
-  const dispatch = useAppDispatch();
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [newPasswordVisible, setNewPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  //    const [changePassword, setChangePassword] = useState(false)
-  const router = useRouter();
-
-  const [changePassword] = useChangePasswordMutation();
-
-  const formik = useFormik({
-    initialValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    },
-    onSubmit: async (values) => {
-      try {
-        const response = await changePassword({
-          old_password: values.currentPassword,
-          new_password: values.newPassword,
-          new_password_confirmation: values.confirmPassword,
-        });
-        console.log("response", JSON.stringify(response, null, 3));
-        if (response?.data?.message === "Password changed successfully") {
-          toast.success(response?.data);
-          router.push("/home");
-
-        }
-        if (response.data?.token) {
-          dispatch(setAuth({ token: response.data.token }));
-          localStorage.setItem("token", response.data.token);
-        } else {
-          console.warn("No token returned from API");
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("An unknown error occurred");
-        }
-      }
-    },
-    validationSchema: toFormikValidationSchema(passwordSchema),
-  });
-
-  //    const handleButtonClick = () => {
-  //     setChangePassword(true)
-  //    }
+    const [activeTab, setActiveTab] = useState<TabType>('password');
   return (
-    /* {!changePassword && (
-    <div className='flex items-center justify-center'>  
-    <button onClick={handleButtonClick} className='bg-blue-800 flex gap-2 px-10 py-2 items-center justify-center rounded-md mt-4 text-white hover:bg-blue-900'>
-        change Password
-    </button>
-    </div>
-)} */
-    <div className="flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-        <h2 className="text-xl font-bold text-gray-800 text-center mb-4">
-          Change Password
-        </h2>
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Current Password
-            </label>
-            <div className="flex gap-5 justify-between w-full px-2 py-2 mt-2 bg-white rounded-xl border border-solid border-neutral-300 focus-within:border-sky-800 text-neutral-400">
-            <input
-              type={passwordVisible ? "text" : "password"}
-              name="currentPassword"
-              value={formik.values.currentPassword}
-              onChange={formik.handleChange}
-              className="bg-transparent text-neutral-950 border-none outline-none w-full"
-              required
-            />
-            {formik.values.currentPassword.length > 0 && (
-              <button
-              type="button"
-              className="focus:outline-none"
-              onClick={() => setPasswordVisible((prev) => !prev)}
-            >
-              {passwordVisible ? (
-                <Eye size={20} color="blue" />
-              ) : (
-                <EyeOff size={20} color="blue" />
-              )}
-            </button>
-            )}
-            
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              New Password
-            </label>
-            <div className="flex gap-5 justify-between w-full px-2 py-2 mt-2 bg-white rounded-xl border border-solid border-neutral-300 focus-within:border-sky-800 text-neutral-400">
-            <input
-              type={newPasswordVisible ? "text" : "password"}
-              name="newPassword"
-              value={formik.values.newPassword}
-              onChange={formik.handleChange}
-              className="bg-transparent text-neutral-950 border-none outline-none w-full"
-              required
-            />
-            {formik.values.newPassword.length > 0 && (
-              <button
-              type="button"
-              className="focus:outline-none"
-              onClick={() => setNewPasswordVisible((prev) => !prev)}
-            >
-              {newPasswordVisible ? (
-                <Eye size={20} color="blue" />
-              ) : (
-                <EyeOff size={20} color="blue" />
-              )}
-            </button>
-            )}
-            
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
-            <div className="flex gap-5 justify-between w-full px-2 py-2 mt-2 bg-white rounded-xl border border-solid border-neutral-300 focus-within:border-sky-800 text-neutral-400">
-            <input
-              type={confirmPasswordVisible ? "text" : "password"}
-              name="confirmPassword"
-              value={formik.values.confirmPassword}
-              onChange={formik.handleChange}
-              className="bg-transparent text-neutral-950 border-none outline-none w-full"
-              required
-            />
-            {formik.values.confirmPassword.length > 0 && (<button
-              type="button"
-              className="px-2 focus:outline-none"
-              onClick={() => setConfirmPasswordVisible((prev) => !prev)}
-            >
-              
-              {confirmPasswordVisible  ? (
-                <Eye size={20} color="blue" />
-              ) : (
-                <EyeOff size={20} color="blue" />
-              )}
-            </button>)}
-             
-            </div>
-          </div>
-          {/* {error && <p className="text-red-500 text-sm text-center">{error}</p>} */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 mt-4 text-white py-3 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          >
-            Update Password
-          </button>
-        </form>
+    // <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+    //   <div className="bg-white max-w-3xl w-full rounded-xl shadow-lg p-8">
+    //     {/* Tabs */}
+    //     <div className="flex space-x-4 border-b pb-2 mb-6">
+    //       <button
+    //         onClick={() => setActiveTab("password")}
+    //         className={`flex items-center gap-2 px-4 py-2 rounded-t-md font-medium ${
+    //           activeTab === "password"
+    //             ? "border-b-2 border-blue-600 text-blue-600"
+    //             : "text-gray-500 hover:text-blue-600"
+    //         }`}
+    //       >
+    //         <Lock size={18} />
+    //         Change Password
+    //       </button>
+    //       <button
+    //         onClick={() => setActiveTab("createClass")}
+    //         className={`flex items-center gap-2 px-4 py-2 rounded-t-md font-medium ${
+    //           activeTab === "createClass"
+    //             ? "border-b-2 border-green-600 text-green-600"
+    //             : "text-gray-500 hover:text-green-600"
+    //         }`}
+    //       >
+    //         <School size={18} />
+    //         Create Class
+    //       </button>
+    //       <button
+    //         onClick={() => setActiveTab("createAcademicYear")}
+    //         className={`flex items-center gap-2 px-4 py-2 rounded-t-md font-medium ${
+    //           activeTab === "createAcademicYear"
+    //             ? "border-b-2 border-purple-600 text-purple-600"
+    //             : "text-gray-500 hover:text-purple-600"
+    //         }`}
+    //       >
+    //         <CalendarDays size={18} />
+    //         Create Academic Year
+    //       </button>
+    //       <button
+    //         onClick={() => setActiveTab("delete")}
+    //         className={`flex items-center gap-2 px-4 py-2 rounded-t-md font-medium ${
+    //           activeTab === "delete"
+    //             ? "border-b-2 border-red-600 text-red-600"
+    //             : "text-gray-500 hover:text-red-600"
+    //         }`}
+    //       >
+    //         <Trash2 size={18} />
+    //         Delete Account
+    //       </button>
+    //     </div>
+
+    //     {/* Tab Content */}
+    //     {activeTab === "password" && (
+    //       <form onSubmit={passwordFormik.handleSubmit} className="space-y-4">
+    //         {/* Your existing password fields here... (omitted for brevity) */}
+    //         {/* Just reuse your existing inputs from above */}
+    //       </form>
+    //     )}
+
+    //     {activeTab === "createClass" && (
+    //       <form onSubmit={classFormik.handleSubmit} className="space-y-4">
+    //         <InputField
+    //           label="Class Name"
+    //           id="name"
+    //           value={classFormik.values.name}
+    //           onChange={classFormik.handleChange}
+    //           error={classFormik.errors.name}
+    //         />
+    //         <InputField
+    //           label="School ID"
+    //           id="schoolId"
+    //           value={classFormik.values.schoolId}
+    //           onChange={classFormik.handleChange}
+    //           error={classFormik.errors.schoolId}
+    //         />
+    //         <button
+    //           type="submit"
+    //           className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md font-semibold transition"
+    //         >
+    //           Create Class
+    //         </button>
+    //       </form>
+    //     )}
+
+    //     {activeTab === "createAcademicYear" && (
+    //       <form
+    //         onSubmit={academicYearFormik.handleSubmit}
+    //         className="space-y-4"
+    //         noValidate
+    //       >
+    //         <InputField
+    //           label="Academic Year Name"
+    //           id="name"
+    //           value={academicYearFormik.values.name}
+    //           onChange={academicYearFormik.handleChange}
+    //           error={academicYearFormik.errors.name}
+    //         />
+    //         <InputField
+    //           label="Start Date"
+    //           id="startDate"
+    //           type="date"
+    //           value={academicYearFormik.values.startDate}
+    //           onChange={academicYearFormik.handleChange}
+    //           error={academicYearFormik.errors.startDate}
+    //         />
+    //         <InputField
+    //           label="End Date"
+    //           id="endDate"
+    //           type="date"
+    //           value={academicYearFormik.values.endDate}
+    //           onChange={academicYearFormik.handleChange}
+    //           error={academicYearFormik.errors.endDate}
+    //         />
+    //         <InputField
+    //           label="School ID"
+    //           id="schoolId"
+    //           value={academicYearFormik.values.schoolId}
+    //           onChange={academicYearFormik.handleChange}
+    //           error={academicYearFormik.errors.schoolId}
+    //         />
+    //         <div className="flex items-center gap-2">
+    //           <input
+    //             id="isCurrent"
+    //             type="checkbox"
+    //             checked={academicYearFormik.values.isCurrent}
+    //             onChange={() =>
+    //               academicYearFormik.setFieldValue(
+    //                 "isCurrent",
+    //                 !academicYearFormik.values.isCurrent
+    //               )
+    //             }
+    //             className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+    //           />
+    //           <label
+    //             htmlFor="isCurrent"
+    //             className="text-sm font-medium text-gray-700"
+    //           >
+    //             Set as current academic year
+    //           </label>
+    //         </div>
+    //         <button
+    //           type="submit"
+    //           className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-md font-semibold transition"
+    //         >
+    //           Create Academic Year
+    //         </button>
+    //       </form>
+    //     )}
+
+    //     {activeTab === "delete" && (
+    //       <div className="text-center">
+    //         <p className="text-sm text-gray-600 mb-4">
+    //           Deleting your account is permanent and cannot be undone. Are you
+    //           sure you want to proceed?
+    //         </p>
+    //         <button
+    //           onClick={() => toast.error("Account deletion not yet implemented.")}
+    //           className="text-red-600 border border-red-500 py-2 px-6 rounded-lg hover:bg-red-50"
+    //         >
+    //           Confirm Delete Account
+    //         </button>
+    //       </div>
+    //     )}
+    //   </div>
+    //   <Toaster position="top-right" />
+    // </div>
+
+    <div className="container mx-auto px-4 w-full">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300">
+        <h1 className="text-2xl font-bold p-6 border-b border-gray-100">
+          User Settings
+        </h1>
+
+        <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        <div className="p-6">
+          {activeTab === "password" && <PasswordTab />}
+          {activeTab === "class" && <ClassTab />}
+          {activeTab === "academic" && <AcademicYearTab />}
+          {activeTab === "delete" && <DeleteAccountTab />}
+        </div>
       </div>
-      <Toaster />
     </div>
   );
 };

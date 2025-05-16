@@ -144,15 +144,19 @@ export interface PaymentHistoryProps {
 
 export interface PayFeesProps {
   student_id: string | null;
+  school_id: string | null;
   term_id: string;
   amount: number | null;
-  payment_method: string;
+  // payment_method: string;
 }
 
 export interface RegisterProps {
   name: string;
   email: string;
   school_id?: string;
+  phone?: string;
+  address?: string;
+  valid_id: string;
 }
 
 export interface AdminResponse {

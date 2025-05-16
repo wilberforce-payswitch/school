@@ -120,7 +120,7 @@ export default function LoginPage() {
                 type="email"
                 value={formik.values.email}
                 id="email"
-                className="w-full px-4 py-2 border text-neutral-800 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
+                className={`w-full px-4 py-2 border text-neutral-800 rounded-lg focus:ring-2 focus:ring-primary ${isError ? "bg-red-200 border border-white": ""} focus:outline-none`}
                 placeholder="Enter your email"
                 onChange={formik.handleChange}
               />
@@ -136,7 +136,7 @@ export default function LoginPage() {
                 type="password"
                 id="password"
                 value={formik.values.password}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
+                className={`w-full px-4 py-2 border text-neutral-700 rounded-lg focus:ring-2 focus:ring-primary ${isError ? "bg-red-200 border border-white": ""} focus:outline-none`}
                 placeholder="Enter your password"
                 onChange={formik.handleChange}
               />

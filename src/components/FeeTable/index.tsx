@@ -6,6 +6,7 @@ import LoadingSpinner from "../Spinner";
 import PaymentModal from "../paymentModal";
 import { useMakePaymentMutation } from "@/state/api";
 import { useRouter } from "next/navigation"; // Import useRouter
+import { useAppSelector } from "@/app/redux";
 
 const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +20,8 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
   const router = useRouter();
 
   const [makePayment] = useMakePaymentMutation();
+
+  const schoolId = useAppSelector((state) => state.global.auth?.user?.school.id)
 
   const openModal = (
     studentId: string,
@@ -52,9 +55,10 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
       try {
         const response = await makePayment({
           student_id: selectedStudentId,
+          school_id: schoolId,
           amount: 0.1,
           term_id: termId,
-          payment_method: "Momo",
+          // payment_method: "Momo",
         });
         console.log("Payment response:", JSON.stringify(response, null, 3));
         if (response?.data?.checkout_url) {

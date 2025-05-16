@@ -5,6 +5,7 @@ import {
   Home,
   LockIcon,
   LogOut,
+  SchoolIcon,
   Settings,
   UserPlus,
   // Settings,
@@ -18,7 +19,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import Link from "next/link";
 import { logout, setIsSidebarCollapsed } from "@/state";
-import {  getInitials } from "@/util/helper";
+import { getInitials } from "@/util/helper";
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
@@ -49,7 +50,6 @@ const Sidebar = () => {
         <div className="flex w-full flex-col justify-start">
           <div className="z-50 flex min-h-[56px] w-64 items-center justify-between px-6 pt-3">
             <Image src="/logo3.svg" alt="logo" width={120} height={60} />
-           
 
             {isSideBarCollapsed ? null : (
               <button
@@ -63,8 +63,9 @@ const Sidebar = () => {
             )}
           </div>
           <div className="flex flex-col items-center border-y-[1.5px] border-[#240fff] px-4 py-4">
-            
-            <div className="text-lg font-bold text-white">{user?.school?.name}</div>
+            <div className="text-lg font-bold text-white">
+              {user?.school?.name}
+            </div>
             <div>
               <div className="mt-1 flex items-start gap-2">
                 <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-200" />
@@ -84,7 +85,7 @@ const Sidebar = () => {
                 />
               </>
             )}
-            {(user?.roleId === 4) && (
+            {user?.roleId === 4 && (
               <>
                 <SidebarLink
                   icon={BadgeCent}
@@ -94,7 +95,7 @@ const Sidebar = () => {
                 <SidebarLink icon={Settings} label="Settings" href="settings" />
               </>
             )}
-            {(user?.roleId === 2) && (
+            {user?.roleId === 2 && (
               <>
                 <SidebarLink
                   icon={BadgeCent}
@@ -104,11 +105,26 @@ const Sidebar = () => {
                 <SidebarLink icon={Settings} label="Settings" href="settings" />
               </>
             )}
-            {user?.roleId === 1 && (<SidebarLink
+            {user?.roleId === 1 && (
+              <>
+               
+                <SidebarLink
                   icon={UserPlus}
                   label="Register"
                   href="/register"
-                />)}
+                />
+                <SidebarLink
+                  icon={SchoolIcon}
+                  label="Schools"
+                  href="/schools"
+                />
+                 <SidebarLink
+                  icon={BadgeCent}
+                  label="Transaction History"
+                  href="/payment-history"
+                />
+              </>
+            )}
 
             {/* <SidebarLink icon={Search} label="Classes" href="/classes" /> */}
           </nav>

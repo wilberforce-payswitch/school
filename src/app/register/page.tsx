@@ -9,7 +9,7 @@ import {
   useCreateClassMutation,
   useCreateSchoolMutation,
   useCreateStudentMutation,
-  useGetAllSchoolsQuery,
+  useGetAllSchoolsFlatQuery,
   useGetSchoolClassesQuery,
   useGetTermsforAClassQuery,
   useRegisterAdminMutation,
@@ -17,7 +17,10 @@ import {
 } from "@/state/api";
 import {
   BadgeCent,
+  IdCard,
   Mail,
+  MapPin,
+  Phone,
   School,
   User,
   UserPlus,
@@ -55,9 +58,15 @@ const Register = () => {
   const [schoolId, setSchoolId] = useState<string | undefined>("");
   const [gender, setGender] = useState<string>("");
   const [step, setStep] = useState(1);
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [identification, setIdentification] = useState("");
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkFile, setBulkFile] = useState<File | null>(null);
 
   const { data: classes } = useGetSchoolClassesQuery(
- userSchoolId ? {school_id: userSchoolId}: skipToken, { skip: user?.roleId !== 2 }
+    userSchoolId ? { school_id: userSchoolId } : skipToken,
+    { skip: user?.roleId !== 2 }
   );
   const { data: terms } = useGetTermsforAClassQuery(
     userSchoolId ? { school_id: userSchoolId } : skipToken,
@@ -71,11 +80,13 @@ const Register = () => {
 
   const [createSchool, { isLoading: creatingSchool }] =
     useCreateSchoolMutation();
-  const { data } = useGetAllSchoolsQuery(
+  const { data } = useGetAllSchoolsFlatQuery(
     user?.roleId === 1 ? undefined : skipToken
   );
 
-  const {data: years} = useAcademicYearQuery()
+  const { data: years } = useAcademicYearQuery();
+
+  console.log("super Admin schools", data)
 
   const schools = data?.schools || [];
 
@@ -95,12 +106,19 @@ const Register = () => {
     setIsModalOpen(false);
   };
 
+  const handleBulkRegistrationClick = () => {
+    setIsBulkModalOpen(true);
+  };
+
   const nextStep = async () => {
     if (step === 1) {
       try {
         const response = await registerParent({
           name: name,
           email: email,
+          phone,
+          address,
+          valid_id: identification,
           school_id: user?.roleId === 2 ? userSchoolId : schoolId,
         });
         if (response?.data?.user) {
@@ -126,7 +144,7 @@ const Register = () => {
           gender: gender,
         });
         if (response?.data) {
-          toast.success(response?.data?.message)
+          toast.success(response?.data?.message);
           setIsModalOpen(false);
           setStudentName("");
           setParentId("");
@@ -143,12 +161,18 @@ const Register = () => {
       const response = await registerAdministrator({
         name: name,
         email: email,
+        phone,
+        address,
+        valid_id: identification,
         school_id: user?.roleId === 2 ? userSchoolId : schoolId,
       });
       if (response?.data) {
         setIsModalOpen(false);
         setName("");
         setEmail("");
+        setPhone("");
+        setAddress("");
+        setIdentification("");
         toast.success(
           response?.data?.message || "Admin registered successfully"
         );
@@ -213,12 +237,11 @@ const Register = () => {
     setIsCreateSchoolModalOpen(true);
   };
 
-
   return (
     <>
       {user?.roleId === 2 ? (
         <div className="flex w-full items-center justify-center  h-full  bg-gray-100 overflow-y-hidden flex-col">
-          <div className="grid grid-cols-2  items-center justify-center gap-5">
+          <div className="grid grid-cols-3  items-center justify-center gap-5">
             <RegistrationCard
               label="Register Admin"
               icon={UserPlus}
@@ -242,6 +265,12 @@ const Register = () => {
               icon={BadgeCent}
               source="/class.jpg"
               onClick={handleEditClick}
+            />
+            <RegistrationCard
+              label="Bulk registration"
+              icon={Users}
+              source="/class.jpg"
+              onClick={handleBulkRegistrationClick}
             />
           </div>
           <h2 className="text-gray-500 text-[10px] mt-8 italic w-1/3 text-center">
@@ -314,6 +343,35 @@ const Register = () => {
                     icon={Mail}
                     required={true}
                   />
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    type="tel"
+                    id="phone"
+                    placeholder="Enter Phone Number"
+                    icon={Phone}
+                    required={true}
+                  />
+
+                  <Input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    type="text"
+                    id="address"
+                    placeholder="Enter Address"
+                    icon={MapPin}
+                    required={true}
+                  />
+
+                  <Input
+                    value={identification}
+                    onChange={(e) => setIdentification(e.target.value)}
+                    type="text"
+                    id="identification"
+                    placeholder="Valid ID (e.g. NIS/Passport)"
+                    icon={IdCard}
+                    required={true}
+                  />
                   {user?.roleId === 1 && (
                     <div className="flex w-full rounded border-gray-400 p-2 shadow-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-600 focus:border-transparent">
                       <select
@@ -376,11 +434,15 @@ const Register = () => {
                   </button>
                 ) : (
                   <button
-                  className={`w-1/2 justify-center items-center py-3 font-medium rounded-xl 
-                    ${step === 1 && (!name || !email) ? "bg-blue-800 text-white bg-opacity-50 cursor-not-allowed" : "bg-blue-800 text-white hover:bg-blue-900"}`}
-                  onClick={nextStep}
-                  disabled={step === 1 && (!name || !email)}
-                >
+                    className={`w-1/2 justify-center items-center py-3 font-medium rounded-xl 
+                    ${
+                      step === 1 && (!name || !email)
+                        ? "bg-blue-800 text-white bg-opacity-50 cursor-not-allowed"
+                        : "bg-blue-800 text-white hover:bg-blue-900"
+                    }`}
+                    onClick={nextStep}
+                    disabled={step === 1 && (!name || !email)}
+                  >
                     {step === 1
                       ? parentLoading
                         ? "Loading..."
@@ -413,7 +475,7 @@ const Register = () => {
           setSelectedClassId={setSelectedClassId}
           onClose={() => setIsEditModalOpen(false)}
           isOpen={isEditModalOpen}
-          userSchoolId= {userSchoolId}
+          userSchoolId={userSchoolId}
           years={years || []}
         />
       )}
@@ -437,6 +499,38 @@ const Register = () => {
           creatingSchool={creatingSchool}
         />
       )}
+
+      {isBulkModalOpen && (
+        <div className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50 p-4">
+          <div className="relative w-full max-w-md rounded-xl bg-white shadow-lg p-6 flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Bulk Registration</h2>
+              <button
+                onClick={() => setIsBulkModalOpen(false)}
+                className="p-1 bg-gray-200 hover:bg-gray-300 rounded-full"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={(e) => setBulkFile(e.target.files?.[0] || null)}
+              className="w-full border rounded p-2"
+            />
+
+            <button
+              className="w-full py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 disabled:bg-opacity-50"
+              onClick={() => {}}
+              disabled={!bulkFile}
+            >
+              Upload & Register
+            </button>
+          </div>
+        </div>
+      )}
+
       <Toaster toastOptions={{ duration: 3000 }} />
     </>
   );

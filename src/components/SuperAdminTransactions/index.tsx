@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAppSelector } from "@/app/redux";
-import { useGetSchoolTransactionHistoryQuery } from "@/state/api";
+import {
+  useDownloadExportMutation,
+  useGetSuperAdminTransactionHistoryQuery,
+} from "@/state/api";
 import React, { useState } from "react";
 import Spinner from "../Spinner";
 import Image from "next/image";
@@ -8,36 +11,39 @@ import Back from "@/assets/icons/back.svg";
 import Forward from "@/assets/icons/forward.svg";
 import Search from "@/assets/icons/search.svg";
 import Refresh from "@/assets/icons/refresh.svg";
-import Filter from '@/assets/icons/filter-search.svg';
+import Filter from "@/assets/icons/filter-search.svg";
 import { ExportButton } from "../ExportButton";
 import ResponsiveTable from "@/components/ResponsiveTable";
 import FilterModal from "../FilterModal";
 
-const AdminPaymentTable = () => {
+const SuperAdminTransactions = () => {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState(""); 
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [filter, setFilter] = useState(false);
   const [filterValues, setFilterValues] = useState<any>({});
 
-  const schoolId = useAppSelector(
-    (state) => state.global.auth?.user?.school.id
+  const user = useAppSelector((state) => state.global.auth?.user);
+
+  const { data, isLoading, isError } = useGetSuperAdminTransactionHistoryQuery(
+    {
+      page,
+      searchTerm: search,
+      per_page: rowsPerPage,
+      status: filterValues.status,
+      startDate: filterValues.date?.from,
+      endDate: filterValues.date?.to,
+    },
+    { skip: user?.roleId !== 1 }
   );
 
-  const { data, isLoading, isError } = useGetSchoolTransactionHistoryQuery({
-    school_id: schoolId,
-    page,
-    searchTerm: search,
-    per_page: rowsPerPage,
-   status: filterValues.status,
-    startDate: filterValues.date?.from,
-    endDate: filterValues.date?.to,
-  });
+  const [downloadExport, { isLoading: Exporting }] =
+    useDownloadExportMutation();
 
-  const allTransactions = data?.data ?? [];
+  const allTransactions = data?.data?.transactions ?? [];
   const count = data?.total ?? 0;
   const totalPages = data?.last_page ?? 1;
 
@@ -76,8 +82,20 @@ const AdminPaymentTable = () => {
     }, 500);
   };
 
-  const handleExport = () => {
-    console.log("Exporting data...");
+  const handleExport = async () => {
+    try {
+      const { url } = await downloadExport().unwrap();
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "transactions.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Export failed", error);
+    }
   };
 
   const columns = [
@@ -89,13 +107,11 @@ const AdminPaymentTable = () => {
         index !== undefined ? (page - 1) * rowsPerPage + index + 1 : "-",
     },
     { id: "transaction_id", header: "Transaction ID", width: "w-1/7" },
-    { id: "termName", header: "Term Name", width: "w-1/7" },
-    { id: "studentName", header: "Student Name", width: "w-1/7" },
-    { id: "className", header: "Class Name", width: "w-1/7" },
-    { id: "amount", header: "Amount", width: "w-1/7" },
+    { id: "school_name", header: "SCHOOL NAME ", width: "w-1/7" },
+    { id: "amount", header: "AMOUNT", width: "w-1/7" },
     {
       id: "status",
-      header: "Status",
+      header: "STATUS",
       width: "w-1/7",
       format: (value: string) => (
         <div
@@ -107,7 +123,7 @@ const AdminPaymentTable = () => {
         </div>
       ),
     },
-    { id: "paymentDate", header: "Payment Date", width: "w-1/7" },
+    { id: "created_at", header: "PAYMENT DATE", width: "w-1/7" },
   ];
 
   if (isLoading) return <Spinner size={32} />;
@@ -121,7 +137,6 @@ const AdminPaymentTable = () => {
             <div className="flex flex-col bg-gray-50">
               <div className="flex flex-row justify-between gap-5 mx-2 md:mx-4 mt-2 md:mt-4">
                 <div className="flex flex-row items-center gap-2 md:gap-3 relative">
-                 
                   <div className="flex items-center border border-searchboxcolor shadow-sm rounded-lg bg-white h-10 px-2 py-2 w-2/3">
                     <Image src={Search} alt="search-icon" />
                     <input
@@ -133,33 +148,31 @@ const AdminPaymentTable = () => {
                       onKeyDown={handleKeyDown}
                     />
                   </div>
-                   <div className="relative z-50">
-                      <button
-                        className={`h-[40px] w-[40px] bg-white border border-searchboxcolor shadow-sm rounded-lg py-1 px-2 flex items-center justify-center ${
-                          filter && "active-btn-glow"
-                        } `}
-                        onClick={() => {
-                          setIsFilterModalOpen((prev) => !prev);
-                        }}
-                      >
-                          <Image src={Filter} alt="filter" />
-                      </button>
+                  <div className="relative z-50">
+                    <button
+                      className={`h-[40px] w-[40px] bg-white border border-searchboxcolor shadow-sm rounded-lg py-1 px-2 flex items-center justify-center ${
+                        filter && "active-btn-glow"
+                      } `}
+                      onClick={() => {
+                        setIsFilterModalOpen((prev) => !prev);
+                      }}
+                    >
+                      <Image src={Filter} alt="filter" />
+                    </button>
 
-                      <div className="absolute text-black top-[100%] mt-2 left-0 w-fit bg-white border border-gray-200 shadow-lg rounded-lg z-50 hidden lg:block">
-                        {isFilterModalOpen && (
-                          <FilterModal
-                            title={""}
-                            filter={filter}
-                            onResetClick={handleResetFilters}
-                            onApplyFilters={handleApplyFilters}
-                            ontapoutside={true}
-                            isLoading={false}
-                          />
-                        )}
-                      </div>
+                    <div className="absolute text-black top-[100%] mt-2 left-0 w-fit bg-white border border-gray-200 shadow-lg rounded-lg z-50 hidden lg:block">
+                      {isFilterModalOpen && (
+                        <FilterModal
+                          title={""}
+                          filter={filter}
+                          onResetClick={handleResetFilters}
+                          onApplyFilters={handleApplyFilters}
+                          ontapoutside={true}
+                          isLoading={false}
+                        />
+                      )}
                     </div>
-
-                  {/* Refresh Button */}
+                  </div>
                   <button
                     className="h-[40px] w-[40px] bg-white border border-searchboxcolor shadow-sm rounded-lg p-2 flex items-center justify-center"
                     onClick={handleRefresh}
@@ -177,12 +190,10 @@ const AdminPaymentTable = () => {
                   </button>
                 </div>
 
-                {/* Export Button */}
-                <ExportButton isExporting={false} onClick={handleExport} />
+                <ExportButton isExporting={Exporting} onClick={handleExport} />
               </div>
             </div>
 
-            {/* Responsive Table */}
             <ResponsiveTable
               isTransactions={true}
               columns={columns}
@@ -190,8 +201,7 @@ const AdminPaymentTable = () => {
               isFetching={isLoading}
               position={(page - 1) * rowsPerPage}
             />
-
-            {/* Pagination */}
+            
             <div className="flex justify-between absolute bottom-0 bg-[#F4F7FCBF] w-full z-20 backdrop-blur-sm flex-row text-headercolor text-xs px-5 py-3">
               <div className="flex flex-row items-center gap-1">
                 <div>
@@ -247,7 +257,7 @@ const AdminPaymentTable = () => {
   );
 };
 
-export default AdminPaymentTable;
+export default SuperAdminTransactions;
 
 const getStatusClass = (status: string) => {
   switch (status.toLowerCase()) {

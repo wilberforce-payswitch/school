@@ -1,6 +1,5 @@
 import { paymentStatusStatistics } from "@/types";
 import React from "react";
-import Carousel from "../Carousel";
 import {
   Bar,
   BarChart,
@@ -25,7 +24,7 @@ const SuperAdminHome = ({ transactions }: prop) => {
     user?.roleId === 1 ? undefined : skipToken
   );
 
-  console.log("Data", JSON.stringify(data, null, 2));
+   
 
   const chartColors = {
     bar: "#8884d8",
@@ -65,16 +64,7 @@ const SuperAdminHome = ({ transactions }: prop) => {
       </div>
       <div className="container w-full items-center justify-center gap-5 flex lg:flex-row-reverse flex-col-reverse">
         <div className="flex flex-col w-full">
-          <div className="mb-4 mt-20 ml-9 p-4 flex flex-col items-start bg-white rounded-lg w-full border border-[#00000026]">
-            <div className="mt-4">
-              <h2 className="text-3xl  font-[700] text-blue-900 ">
-                GH₵ {transactions?.totalAmount}
-              </h2>
-              <div className="text-sm text-[#49454FCC] font-[600]">
-                Total Successful Payments
-              </div>
-            </div>
-          </div>
+         
           <ResponsiveContainer width="100%" height={300} className="mt-5">
             <BarChart data={data || []}>
               <CartesianGrid
@@ -91,8 +81,16 @@ const SuperAdminHome = ({ transactions }: prop) => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-
-        <Carousel />
+        <div className="mb-4 p-4 flex flex-col items-start bg-white rounded-lg w-72 border shadow-md border-[#00000026]">
+            <div className="mt-4">
+              <h2 className="text-3xl  font-[700] text-blue-900 ">
+                GH₵ {transactions?.totalAmount}
+              </h2>
+              <div className="text-sm text-[#49454FCC] font-[600]">
+                Total Successful Payments
+              </div>
+            </div>
+          </div>
       </div>
     </div>
   );
