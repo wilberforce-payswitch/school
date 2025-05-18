@@ -6,7 +6,6 @@ import Modal from "@/components/Modal";
 import RegistrationCard from "@/components/RegistrationCard";
 import {
   useAcademicYearQuery,
-  useCreateClassMutation,
   useCreateSchoolMutation,
   useCreateStudentMutation,
   useGetAllSchoolsFlatQuery,
@@ -41,7 +40,6 @@ const Register = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateSchoolModalOpen, setIsCreateSchoolModalOpen] = useState(false);
-  const [isCreateClassModalOpen, setIsCreateClassModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState<string>("");
   const [email, setEmail] = useState("");
@@ -49,7 +47,6 @@ const Register = () => {
   const [studentName, setStudentName] = useState("");
   const [parentId, setParentId] = useState("");
   const [selectedClassId, setSelectedClassId] = useState<string>("");
-  const [className, setClassName] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [schoolAddress, setSchoolAddress] = useState("");
   const [schoolPhone, setSchoolPhone] = useState("");
@@ -76,7 +73,7 @@ const Register = () => {
   const [registerParent, { isLoading: parentLoading }] =
     useRegisterParentMutation();
   const [createStudent] = useCreateStudentMutation();
-  const [createClass, { isLoading: creatingClass }] = useCreateClassMutation();
+  
 
   const [createSchool, { isLoading: creatingSchool }] =
     useCreateSchoolMutation();
@@ -85,8 +82,6 @@ const Register = () => {
   );
 
   const { data: years } = useAcademicYearQuery();
-
-  console.log("super Admin schools", data)
 
   const schools = data?.schools || [];
 
@@ -183,28 +178,7 @@ const Register = () => {
     }
   };
 
-  const handleCreateClassClick = () => {
-    setIsCreateClassModalOpen(true);
-  };
-
-  const handleCreateClass = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await createClass({
-        name: className,
-        school_id: userSchoolId,
-      });
-      if (response.data?.message) {
-        toast.success(response?.data?.message);
-      }
-      setClassName("");
-      setIsCreateClassModalOpen(false);
-      console.log("response", JSON.stringify(response, null, 3));
-    } catch (error) {
-      console.log("error from registration", error);
-    }
-  };
-
+  
   const handleCreateSchool = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -255,29 +229,13 @@ const Register = () => {
               onClick={handleParentClick}
             />
             <RegistrationCard
-              label="Create Class"
-              icon={Users}
-              source="/class.jpg"
-              onClick={handleCreateClassClick}
-            />
-            <RegistrationCard
               label="Edit Fees"
               icon={BadgeCent}
               source="/class.jpg"
               onClick={handleEditClick}
             />
-            <RegistrationCard
-              label="Bulk registration"
-              icon={Users}
-              source="/class.jpg"
-              onClick={handleBulkRegistrationClick}
-            />
           </div>
-          <h2 className="text-gray-500 text-[10px] mt-8 italic w-1/3 text-center">
-            A beacon for future leaders, our school cultivates young minds with
-            a focus on excellence, innovation, and integrity, empowering them to
-            shape a brighter tomorrow.
-          </h2>
+         
         </div>
       ) : (
         <div className="flex w-full items-center justify-center  h-full  bg-gray-100 overflow-y-hidden flex-col">
@@ -455,17 +413,6 @@ const Register = () => {
           </div>
         </>
       )}
-      {isCreateClassModalOpen && (
-        <Modal
-          title="Create class"
-          createClass={handleCreateClass}
-          creatingClass={creatingClass}
-          className={className}
-          setClassName={setClassName}
-          isOpen={isCreateClassModalOpen}
-          onClose={() => setIsCreateClassModalOpen(false)}
-        />
-      )}
 
       {isEditModalOpen && (
         <EditModal
@@ -499,38 +446,6 @@ const Register = () => {
           creatingSchool={creatingSchool}
         />
       )}
-
-      {isBulkModalOpen && (
-        <div className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50 p-4">
-          <div className="relative w-full max-w-md rounded-xl bg-white shadow-lg p-6 flex flex-col gap-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Bulk Registration</h2>
-              <button
-                onClick={() => setIsBulkModalOpen(false)}
-                className="p-1 bg-gray-200 hover:bg-gray-300 rounded-full"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <input
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={(e) => setBulkFile(e.target.files?.[0] || null)}
-              className="w-full border rounded p-2"
-            />
-
-            <button
-              className="w-full py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 disabled:bg-opacity-50"
-              onClick={() => {}}
-              disabled={!bulkFile}
-            >
-              Upload & Register
-            </button>
-          </div>
-        </div>
-      )}
-
       <Toaster toastOptions={{ duration: 3000 }} />
     </>
   );

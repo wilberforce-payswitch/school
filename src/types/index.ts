@@ -270,3 +270,26 @@ export interface ClassFeeProp {
   class_id: string | undefined,
   due_date: string
 }
+
+
+export interface CreateAcademicYearRequest {
+  school_id: string;
+  name: string;
+  start_date: string; // ISO date string
+  end_date: string;   // ISO date string
+  is_current?: boolean;
+}
+
+export interface AcademicYearResponse {
+  message: string;
+  academic_year: {
+    id: string;
+    name: string;
+    school_id: string;
+    start_date: string;
+    end_date: string;
+    is_current: boolean;
+    created_at: string;
+    updated_at: string;
+  };
+}

@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { InputField, DateField, CheckboxField, Button } from '@/components/SettingsFormElement';
+import { useCreateAcademicYearMutation } from '@/state/api';
+import { useAppSelector } from '@/app/redux';
 
 interface AcademicYearForm {
   name: string;
   startDate: string;
   endDate: string;
-  schoolId: string;
+  schoolId?: string;
   isCurrent: boolean;
 }
 
@@ -22,13 +25,15 @@ const AcademicYearTab: React.FC = () => {
     name: '',
     startDate: '',
     endDate: '',
-    schoolId: '',
     isCurrent: false,
   });
   
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
+  const schoolId = useAppSelector((state) => state.global.auth?.user?.school.id)
+
+  const [createAcademicYear] = useCreateAcademicYearMutation()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type, checked } = e.target;
@@ -68,39 +73,47 @@ const AcademicYearTab: React.FC = () => {
       newErrors.dateRange = 'End date must be after start date';
     }
     
-    if (!formData.schoolId.trim()) {
-      newErrors.schoolId = 'School ID is required';
-    } else if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(formData.schoolId)) {
-      newErrors.schoolId = 'Please enter a valid UUID format';
-    }
-    
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      setIsSubmitting(true);
-      
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setSuccess(`Academic year "${formData.name}" created successfully!`);
-        setFormData({
-          name: '',
-          startDate: '',
-          endDate: '',
-          schoolId: '',
-          isCurrent: false,
-        });
-      }, 1500);
-    }
-  };
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  setIsSubmitting(true);
+
+  try {
+    const payload = {
+      school_id: schoolId,
+      name: formData.name,
+      start_date: formData.startDate,
+      end_date: formData.endDate,
+      is_current: formData.isCurrent,
+    };
+
+    const res = await createAcademicYear(payload).unwrap();
+
+    setSuccess(`Academic year "${res.academic_year.name}" created successfully!`);
+    setFormData({
+      name: '',
+      startDate: '',
+      endDate: '',
+      isCurrent: false,
+    });
+    setErrors({});
+  } catch (err: any) {
+    setErrors({ name: err?.data?.message || 'Failed to create academic year' });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn justify-center items-center">
       <h2 className="text-xl font-semibold mb-4 text-purple-500">Create Academic Year</h2>
       <p className="text-gray-600 mb-6">
         Add a new academic year.
@@ -112,7 +125,7 @@ const AcademicYearTab: React.FC = () => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 mx-auto w-[70%]">
         <InputField
           label="Academic Year Name"
           id="name"

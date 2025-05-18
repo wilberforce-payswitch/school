@@ -5,9 +5,11 @@ import {
   loginUrl,
 } from "@/services/enpoints";
 import {
+  AcademicYearResponse,
   AdminResponse,
   AuthResponse,
   ClassFeeProp,
+  CreateAcademicYearRequest,
   CreateClassResponse,
   OtpProps,
   ParentResponse,
@@ -31,7 +33,7 @@ export const api = createApi({
     credentials: "include",
   }),
   reducerPath: "api",
-  tagTypes: ["SchoolClass", "Students", "StudentBalances"],
+  tagTypes: ["SchoolClass", "Students", "StudentBalances", "AcademicYear"],
   endpoints: (build) => ({
     loginUser: build.mutation<
       AuthResponse,
@@ -238,8 +240,12 @@ export const api = createApi({
         body: data,
       }),
     }),
-    academicYear: build.query<any[], void>({
-      query: () => "academic-year",
+    getAcademicYear: build.query<any, string | undefined>({
+      query: (schoolId) => ({
+        url: `/academic-year`,
+        method: "GET",
+        params: { school_id: schoolId },
+      }),
     }),
     getSchoolTransactionHistory: build.query<
       {
@@ -345,6 +351,57 @@ export const api = createApi({
       query: () => `schools?per_page=1000`,
       transformResponse: (response: { data: any[] }) => response.data,
     }),
+    bulkStudentRegistration: build.mutation<
+      any,
+      { file: File; class_id: string }
+    >({
+      query: ({ file, class_id }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("class_id", class_id);
+
+        return {
+          url: "/students/bulk-upload",
+          method: "POST",
+          body: formData,
+        };
+      },
+    }),
+    createAcademicYear: build.mutation<
+      AcademicYearResponse,
+      CreateAcademicYearRequest
+    >({
+      query: (body) => ({
+        url: "schools/academic-year",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["AcademicYear"],
+    }),
+    createFees: build.mutation<
+      any,
+      {
+        name: string;
+        academic_year_id: string;
+        amount: number;
+        school_id: string;
+        class_id: string[];
+        due_date: string;
+      }
+    >({
+      query: (data) => ({
+        url: "/create-fees",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    createAdditionalFees: build.mutation<any, {name: string; amount:string; term_id: string;}>({
+      query: (data) => ({
+        url: "create-fees/additional-fees",
+        method: "POST",
+        body: data,
+      }),
+    })
   }),
 });
 
@@ -370,10 +427,14 @@ export const {
   useVerifyOtpMutation,
   useChangePasswordMutation,
   useCreateSchoolMutation,
-  useAcademicYearQuery,
+  useGetAcademicYearQuery,
   useCreateClassFeesMutation,
   useGetSchoolTransactionHistoryQuery,
   useGetSuperAdminTransactionHistoryQuery,
   useDownloadExportMutation,
-  useGetAllSchoolsFlatQuery
+  useGetAllSchoolsFlatQuery,
+  useBulkStudentRegistrationMutation,
+  useCreateAcademicYearMutation,
+  useCreateFeesMutation,
+  useCreateAdditionalFeesMutation
 } = api;

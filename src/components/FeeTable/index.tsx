@@ -112,7 +112,7 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
           </tr>
         </thead>
         <tbody>
-          {payments.map((payment) => (
+          {payments?.map((payment) => (
             <>
               {payment.balances.map((balance: Fee) => (
                 <tr key={`${payment.studentId}-${balance.termName}`} className="bg-white border-b">
@@ -131,12 +131,12 @@ const FeeTable = ({ payments, loading }: PaymentHistoryProps) => {
                     <button
                       onClick={() =>
                         openModal(
-                          payment.studentId,
-                          balance.termName,
-                          balance.termFees,
-                          balance.balanceDue,
-                          balance.totalPaid,
-                          balance.termId.toString()
+                          payment?.studentId,
+                          balance?.termName,
+                          balance?.termFees,
+                          balance?.balanceDue,
+                          balance?.totalPaid,
+                          balance?.termId.toString()
                         )
                       }
                       className="font-medium bg-blue-600 text-white rounded-md px-6 py-2 hover:bg-blue-700"

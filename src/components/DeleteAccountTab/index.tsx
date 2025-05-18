@@ -29,7 +29,7 @@ const DeleteAccountTab: React.FC = () => {
   };
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn justify-center items-center flex flex-col">
       <h2 className="text-xl font-semibold mb-4 text-red-500">Delete Account</h2>
       
       {!showConfirmation ? (
@@ -53,7 +53,7 @@ const DeleteAccountTab: React.FC = () => {
           <Button 
             color="red"
             onClick={handleDeleteRequest}
-            className="hover:bg-red-600 transition-colors duration-300"
+            className="hover:bg-red-600 transition-colors duration-300 max-w-2xl"
           >
             Delete Account
           </Button>

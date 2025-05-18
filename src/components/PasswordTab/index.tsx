@@ -88,7 +88,7 @@ const PasswordTab: React.FC = () => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl mx-auto">
         <InputField
           label="Current Password"
           id="currentPassword"

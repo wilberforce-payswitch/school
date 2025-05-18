@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { InputField, Button } from '@/components/SettingsFormElement';
+import { useCreateClassMutation } from '@/state/api';
+import { useAppSelector } from '@/app/redux';
+import toast, { Toaster } from "react-hot-toast";
 
 interface ClassForm {
   className: string;
@@ -16,9 +19,11 @@ const ClassTab: React.FC = () => {
     className: '',
     schoolId: '',
   });
+   const userSchoolId = useAppSelector(
+      (state) => state?.global?.auth?.user?.school?.id
+    );
   
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +36,8 @@ const ClassTab: React.FC = () => {
     // Clear success message when user makes changes
     if (success) setSuccess('');
   };
+
+  const [createClass, { isLoading: creatingClass }] = useCreateClassMutation();
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -49,23 +56,28 @@ const ClassTab: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      setIsSubmitting(true);
+ const handleCreateClass = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+     if(!validateForm) return;
+     
+     try {
+       const response = await createClass({
+         name: formData.className,
+         school_id: userSchoolId,
+       });
+       if (response.data?.message) {
+         toast.success(response?.data?.message);
+       }
+       setFormData({
+        className: '',
+        schoolId: '',
+       });
       
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setSuccess(`Class "${formData.className}" created successfully!`);
-        setFormData({
-          className: '',
-          schoolId: '',
-        });
-      }, 1500);
-    }
-  };
+       console.log("response", JSON.stringify(response, null, 3));
+     } catch (error) {
+       console.log("error from registration", error);
+     }
+   };
 
   return (
     <div className="animate-fadeIn justify-center items-center">
@@ -80,7 +92,7 @@ const ClassTab: React.FC = () => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-4xl mx-auto">
+      <form onSubmit={handleCreateClass} className="space-y-4 max-w-xl mx-auto">
         <InputField
           label="Class Name"
           id="className"
@@ -97,15 +109,16 @@ const ClassTab: React.FC = () => {
           <Button 
             type="submit" 
             color="blue"
-            disabled={isSubmitting}
+            disabled={creatingClass}
             className="group"
           >
             <span className="group-hover:translate-x-1 transition-transform duration-200">
-              {isSubmitting ? 'Creating Class...' : 'Create Class'}
+              {creatingClass ? 'Creating Class...' : 'Create Class'}
             </span>
           </Button>
         </div>
       </form>
+        <Toaster toastOptions={{ duration: 3000 }} />
     </div>
   );
 };
